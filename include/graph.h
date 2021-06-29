@@ -1,14 +1,17 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <random>
 
 class Graph 
 {
+public:
+
 	Graph (int num_verteces) : num_verteces (num_verteces) 
 	{
 		// initialize with empty lists of edges each vertex
 		for(int i=0; i<num_verteces; ++i)
-			test.insert({i, std::vector<int>()});
+			graph.insert({i, std::vector<int>()});
 	};
 
 	Graph (const Graph&) = delete;
@@ -18,6 +21,10 @@ class Graph
 	Graph& operator=(Graph&&) = default;
 
 	~Graph() = default;
+
+
+	// operators overloading 
+	const std::vector<int>& operator[](int vertex) { return graph[vertex]; }
 
 	// num_edges is the maximum number of edges per vertex
 	void populateGraph(int maxNumEdges)
@@ -48,8 +55,8 @@ class Graph
 		for (int i=0; i<num_verteces; ++i)
 		{
 			std::cout << "v: " << i;
-			for (int j=0; j<test[i].size(); ++j)
-				std::cout <<  "  edges: " << test[i][j];
+			for (int j=0; j<graph[i].size(); ++j)
+				std::cout <<  "  edges: " << graph[i][j];
 
 			std::cout << '\n';
 		}
