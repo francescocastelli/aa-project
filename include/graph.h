@@ -2,16 +2,26 @@
 #include <map>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
 class Graph 
 {
+private: 
+	using graphTy = std::map<int, std::vector<int>>;
+	using orderTy = std::vector<int>;
+
 public:
 
-	Graph (int num_verteces) : num_verteces (num_verteces) 
+	Graph (int num_verteces) : num_verteces (num_verteces), 
+							   order(num_verteces)
 	{
 		// initialize with empty lists of edges each vertex
 		for(int i=0; i<num_verteces; ++i)
 			graph.insert({i, std::vector<int>()});
+
+		// random order of verteces from 0 to num_verteces
+		std::iota(order.begin(), order.end(), 0);
+		std::random_shuffle(order.begin(), order.end());
 	};
 
 	Graph (const Graph&) = delete;
@@ -22,7 +32,6 @@ public:
 
 	~Graph() = default;
 
-
 	// operators overloading 
 	const std::vector<int>& operator[](int vertex) { return graph[vertex]; }
 
@@ -31,23 +40,51 @@ public:
 	{
 		for (int i=0; i<num_verteces; ++i)
 		{
-			std::vector<int> edges; 
-			
 			// generate edges at random 
 			for (int j=0; j<maxNumEdges; ++j)
 			{
 				int edge = randomEdge(); 
-				if (edge != i) edges.push_back(edge);
+				if (edge != i && std::count(graph[i].begin(), graph[i].end(), edge) == 0)
+					graph[i].push_back(edge);
 			}
 
-			// add verteces in edges to vertex i vector and 
-			// add vertex i to all the verteces vectors in edges
-			for (int j=0; j<edges.size(); ++j)
+			// add vertex i to all the verteces vectors in graph[i] 
+			for (int j=0; j<graph[i].size(); ++j)
 			{
-				graph[edges[j]].push_back(i);
-				graph[i].push_back(edges[j]);
+				if (std::count(graph[graph[i][j]].begin(), graph[graph[i][j]].end(), i) == 0)
+					graph[graph[i][j]].push_back(i);
 			}
 		}
+	}
+
+	// get the vertex based on the order (this is a) 
+	int getVertex(int orderIdx) 
+	{
+		return order[orderIdx];	
+	}
+
+	const orderTy& getOrder()
+	{
+		return order;
+	}
+
+	// get the order based on the vertex (this is a^-1) 
+	int getOrder(int vertex) 
+	{
+		auto it = std::find(order.begin(), order.end(), vertex);
+		return std::distance(order.begin(), it); 
+	}
+
+
+	std::vector<int> getMonotonicAdj(int vertex)
+	{
+		std::vector<int> mAdj;
+
+		for (int i=0; i<graph[vertex].size(); ++i)
+			if (getOrder(vertex) < getOrder(graph[vertex][i])) 
+				mAdj.push_back(graph[vertex][i]);
+		
+		return mAdj;
 	}
 
 	void printGraph()
@@ -72,9 +109,9 @@ public:
     }
 
 private: 
-	using graphTy = std::map<int, std::vector<int>>;
 
 	int num_verteces;
 	graphTy graph;
+	orderTy order;
 };
 
