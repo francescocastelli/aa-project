@@ -1,4 +1,4 @@
-#include "../include/graph.h"
+#include "../../include/graph.h"
 #include <gtest/gtest.h>
 #include <algorithm>
 
@@ -36,7 +36,7 @@ class GraphTest : public ::testing::Test {
 
 // Tests that the Graph::populateGraph() method create all the verteces in the 
 // right place.
-TEST_F(GraphTest, MethodBarDoesAbc) {
+TEST_F(GraphTest, GraphPopoluateEdges) {
   Graph g(20);
   g.populateGraph(5);
 
@@ -55,6 +55,59 @@ TEST_F(GraphTest, MethodBarDoesAbc) {
   }
 }
 
+TEST_F(GraphTest, GraphMoreEdgesThanVerteces) {
+  Graph g(20);
+  g.populateGraph(25);
+
+  // it through verteces
+  for(int i=0; i<20; ++i)
+  {
+	  auto edges = g[i];
+
+	  // through verteces in edges of vertex i
+	  for(int j=0; j<edges.size(); ++j)
+	  {
+		  auto edges_two = g[edges[j]];
+		  auto it = std::find(edges_two.begin(), edges_two.end(), i);
+		  EXPECT_FALSE(it == edges_two.end());
+	  }
+  }
+}
+
+TEST_F(GraphTest, GraphNoSameVertexInEdges) {
+  Graph g(20);
+  g.populateGraph(25);
+
+  // it through verteces
+  for(int i=0; i<20; ++i)
+  {
+	  auto edges = g[i];
+
+	  // through verteces in edges of vertex i
+	  for(int j=0; j<edges.size(); ++j)
+		  EXPECT_FALSE(i == edges[j]);
+  }
+}
+
+TEST_F(GraphTest, GraphNoDuplicateEdges) {
+  Graph g(20);
+  g.populateGraph(25);
+
+  // it through verteces
+  for(int i=0; i<20; ++i)
+  {
+	  auto edges = g[i];
+
+	  // through verteces in edges of vertex i
+	  for(int j=0; j<edges.size(); ++j)
+	  {
+		  auto edges_two = g[edges[j]];
+		  auto count = std::count(edges_two.begin(), edges_two.end(), i);
+		  EXPECT_TRUE(count < 2);
+	  }
+  }
+}
+
 }  // namespace
 }  // namespace project
 }  // namespace my
@@ -63,4 +116,3 @@ int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
