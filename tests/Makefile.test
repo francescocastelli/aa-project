@@ -1,0 +1,14 @@
+cc := g++
+ccflags := -O3
+lflags := -lgtest -lgtest_main -lpthread
+obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+rm := rm -f
+
+test: $(obj)
+	$(cc) -o test $(obj) $(lflags) 
+
+%.o:  %.cpp 
+	$(cc) -o $@ -c $< $(ccflags) 
+
+clean: 
+	$(rm) *.o
