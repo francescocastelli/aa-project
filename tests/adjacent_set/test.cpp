@@ -41,7 +41,7 @@ TEST_F(GraphTest, GraphAdjSet) {
   // it through verteces
   for(int i=0; i<20; ++i)
   {
-	  auto mAdjSet = g.getMonotonicAdj(i);
+	  auto mAdjSet = g.getMonotonicAdjSet(i);
 	  // through verteces in edges of vertex i
 	  for(int j=0; j<mAdjSet.size(); ++j)
 	  {
