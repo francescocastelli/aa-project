@@ -1,14 +1,15 @@
 cc := g++
 ccflags := -O3
 lflags := -lgtest -lgtest_main -lpthread
+src := ../../src/graph.cpp
 obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 rm := rm -f
 
 test: $(obj)
-	$(cc) -o test $(obj) $(lflags) 
+	$(cc) -o test $(obj) graph.o $(lflags) 
 
 %.o:  %.cpp 
-	$(cc) -o $@ -c $< $(ccflags) 
+	$(cc) -c $< $(src) $(ccflags) 
 
 clean: 
 	$(rm) *.o
