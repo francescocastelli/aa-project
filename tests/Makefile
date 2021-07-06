@@ -1,4 +1,4 @@
-dirs := graph_creation adjacent_set
+dirs := graph_creation adjacent_set fill
 
 test: $(dirs)
 
