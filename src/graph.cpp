@@ -92,11 +92,16 @@ void Graph::printGraph()
 {
 	for (int i=0; i<num_verteces; ++i)
 	{
-		std::cout << "v: " << i;
+		std::cout << "v: " << i << '\n';
+		std::cout << "	edges: ";
 		for (int j=0; j<graph[i].edges.size(); ++j)
-			std::cout <<  "  edges: " << graph[i].edges[j];
+			std::cout <<  " [" << graph[i].edges[j] << "] ";
 
-		std::cout << '\n';
+		std::cout << '\n' << "	mAdj: ";
+		for (int j=0; j<graph[i].monAdjSet.size(); ++j)
+			std::cout <<  " [" << graph[i].monAdjSet[j] << "] ";
+
+		std::cout << "\n\n";
 	}
 }
 
@@ -114,7 +119,7 @@ void Graph::fill()
 	// begin
 	std::map<int, std::vector<int>> out;
 	std::vector<bool> test(num_verteces, false);
-	int k, v;
+	int k, v, size;
 
 	// loop
 	for(int i=0; i<num_verteces; ++i)
@@ -123,6 +128,7 @@ void Graph::fill()
 		v = getVertex(i); 
 
 		// dup 
+		//size = graph[v].monAdjSet.size();
 		for (int j=0; j<graph[v].monAdjSet.size(); ++j)
 		{
 			int w = graph[v].monAdjSet[j];
@@ -130,7 +136,15 @@ void Graph::fill()
 			
 			if (test[wOrder]) 	
 			{
-				std::remove(graph[v].monAdjSet.begin(), graph[v].monAdjSet.end(), w);
+				//std::remove(graph[v].monAdjSet.begin(), graph[v].monAdjSet.end(), w);
+				auto it = std::find(graph[v].monAdjSet.begin(), graph[v].monAdjSet.end(), w);
+				if (it != graph[v].monAdjSet.end()) 
+				{
+					std::swap(*it, graph[v].monAdjSet.back());
+					graph[v].monAdjSet.pop_back();
+					--j;
+				}
+
 			}
 			else
 			{
@@ -139,10 +153,11 @@ void Graph::fill()
 			}
 		}
 
-		int m = k;
+		int m = getVertex(k);
 
 		// add 
-		for (int j=0; j<graph[v].monAdjSet.size(); ++j)
+		size = graph[v].monAdjSet.size();
+		for (int j=0; j<size; ++j)
 		{
 			int w = graph[v].monAdjSet[j];
 			test[getOrder(w)] = false;
