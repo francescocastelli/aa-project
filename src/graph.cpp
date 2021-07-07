@@ -3,59 +3,42 @@
 #include <iostream>
 #include <algorithm>
 
-Graph::Graph (int num_verteces) : num_verteces (num_verteces), 
-						   		  order(num_verteces)
+Graph::Graph() : numNodes (0)
 {
-	// initialize with empty lists of edges and monAdj set each vertex
-	for(int i=0; i<num_verteces; ++i)
-		graph.insert({i, {std::vector<int>(), std::vector<int>()}});
-
-	// random order of verteces from 0 to num_verteces
-	std::iota(order.begin(), order.end(), 0);
-	std::random_shuffle(order.begin(), order.end());
 }
 
-const Graph::edgeListTy& Graph::operator[](int vertex) 
-{ 
-	return graph[vertex].edges; 
+void Graph::addNode(int n)
+{
+	graph.insert({n, {nodeListTy()}});
+	++numNodes;
 }
 
-const Graph::edgeListTy& Graph::getEdges(int vertex)
+void Graph::addEdge(int n1, int n2)
 {
-	return graph[vertex].edges; 
-}
+	if (graph.count(n1) == 0) ++numNodes;
+	if (graph.count(n2) == 0) ++numNodes;
 
-const Graph::edgeListTy& Graph::getMonotonicAdjSet(int vertex)
-{
-	return graph[vertex].monAdjSet;
+	graph[n1].adjSet.push_back(n2);
+	graph[n2].adjSet.push_back(n1);
 }
 
 // num_edges is the maximum number of edges per vertex
-void Graph::populateGraph(int maxNumEdges)
+void Graph::randomPopulate(int numNodes, int maxNumEdges)
 {
-	for (int i=0; i<num_verteces; ++i)
-	{
-		// generate edges at random 
+	// add nodes from 0 to numNodes
+	for (int i=0; i<numNodes; ++i)
+		addNode(i);
+
+	// generate edges at random for each node i
+	for (int i=0; i<numNodes; ++i)
 		for (int j=0; j<maxNumEdges; ++j)
 		{
-			int edge = randomEdge(); 
-			if (edge != i && std::count(graph[i].edges.begin(), graph[i].edges.end(), edge) == 0)
-				graph[i].edges.push_back(edge);
-		}
+			int node = randomNode(0, numNodes-1); 
+			int nodeCount = std::count(graph[i].adjSet.begin(), graph[i].adjSet.end(), node);
 
-		// add vertex i to all the verteces vectors in graph[i] 
-		for (int j=0; j<graph[i].edges.size(); ++j)
-		{
-			if (std::count(graph[graph[i].edges[j]].edges.begin(), 
-						   graph[graph[i].edges[j]].edges.end(), i) == 0)
-				graph[graph[i].edges[j]].edges.push_back(i);
+			if (node != i && nodeCount == 0)
+				addEdge(i, node);
 		}
-	}
-	
-	for (int i=0; i<num_verteces; ++i)
-	{
-		graph[i].monAdjSet = std::move(computeMonAdjSet(i));
-	}
 }
 
 // get the vertex based on the order (this is a) 
@@ -71,98 +54,46 @@ int Graph::getOrder(int vertex)
 	return std::distance(order.begin(), it); 
 }
 
-const Graph::edgeListTy& Graph::getOrder()
+const Graph::nodeListTy& Graph::getOrder()
 {
 	return order;
 }
 
-Graph::edgeListTy Graph::computeMonAdjSet(int vertex)
+Graph::nodeListTy Graph::getAdjSet(int n)
 {
-	std::vector<int> mAdj;
+	return graph[n].adjSet;
+}
 
-	for (int i=0; i<graph[vertex].edges.size(); ++i)
-		if (getOrder(vertex) < getOrder(graph[vertex].edges[i])) 
-			mAdj.push_back(graph[vertex].edges[i]);
+Graph::nodeListTy Graph::getMonAdjSet(int n)
+{
+	nodeListTy mAdj;
+
+	for (int i=0; i<graph[n].adjSet.size(); ++i)
+		if (getOrder(n) < getOrder(graph[n].adjSet[i])) 
+			mAdj.push_back(graph[n].adjSet[i]);
 	
 	return mAdj;
 }
 
-
 void Graph::printGraph()
 {
-	for (int i=0; i<num_verteces; ++i)
+	for (int i=0; i<numNodes; ++i)
 	{
 		std::cout << "v: " << i << '\n';
 		std::cout << "	edges: ";
-		for (int j=0; j<graph[i].edges.size(); ++j)
-			std::cout <<  " [" << graph[i].edges[j] << "] ";
+		for (int j=0; j<graph[i].adjSet.size(); ++j)
+			std::cout <<  " [" << graph[i].adjSet[j] << "] ";
 
-		std::cout << '\n' << "	mAdj: ";
-		for (int j=0; j<graph[i].monAdjSet.size(); ++j)
-			std::cout <<  " [" << graph[i].monAdjSet[j] << "] ";
-
-		std::cout << "\n\n";
+		std::cout << "\n";
 	}
 }
 
-int Graph::randomEdge()
+int Graph::randomNode(int min, int max)
 {
 	std::random_device dev;
 	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist(0, num_verteces-1);
+	std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
 
 	return dist(rng);
 }
 
-void Graph::fill()
-{
-	// begin
-	std::map<int, std::vector<int>> out;
-	std::vector<bool> test(num_verteces, false);
-	int k, v, size;
-
-	// loop
-	for(int i=0; i<num_verteces; ++i)
-	{
-		k = num_verteces;
-		v = getVertex(i); 
-
-		// dup 
-		//size = graph[v].monAdjSet.size();
-		for (int j=0; j<graph[v].monAdjSet.size(); ++j)
-		{
-			int w = graph[v].monAdjSet[j];
-			int wOrder = getOrder(w);
-			
-			if (test[wOrder]) 	
-			{
-				//std::remove(graph[v].monAdjSet.begin(), graph[v].monAdjSet.end(), w);
-				auto it = std::find(graph[v].monAdjSet.begin(), graph[v].monAdjSet.end(), w);
-				if (it != graph[v].monAdjSet.end()) 
-				{
-					std::swap(*it, graph[v].monAdjSet.back());
-					graph[v].monAdjSet.pop_back();
-					--j;
-				}
-
-			}
-			else
-			{
-				test[wOrder] = true;
-				k = std::min(k, wOrder);
-			}
-		}
-
-		int m = getVertex(k);
-
-		// add 
-		size = graph[v].monAdjSet.size();
-		for (int j=0; j<size; ++j)
-		{
-			int w = graph[v].monAdjSet[j];
-			test[getOrder(w)] = false;
-
-			if (w != m) graph[m].monAdjSet.push_back(w);
-		}
-	}
-}

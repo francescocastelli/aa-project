@@ -3,21 +3,19 @@
 
 class Graph 
 {
-	using edgeListTy = std::vector<int>;
+	using nodeListTy = std::vector<int>;
 
 private:
 
 	struct nodeInfo 
 	{
-		// each vertex in edges indicates the 2nd vertex of the edge
-		// i ---- j   means graph[i].edges contains j
-		edgeListTy edges; 
-		// monotonic adj set for the vertex
-		edgeListTy monAdjSet;
+		// each vertex in adjSet indicates the 2nd vertex of the edge
+		// i ---- j   means graph[i].adjSet contains j
+		nodeListTy adjSet; 
 	};
 
 public:
-	Graph (int num_verteces);
+	Graph ();
 
 	Graph (const Graph&) = delete;
 	Graph (Graph&&) = default;
@@ -27,15 +25,15 @@ public:
 
 	~Graph() = default;
 
-	// returns only the list of edges adj to the vertex
-	const edgeListTy& operator[](int vertex); 
-	const edgeListTy& getEdges(int vertex);
+	// add a new edge btw n1 and n2 
+	// if one of the nodes is not present, it will be inserted
+	void addEdge(int n1, int n2);
 
-	// returns the monotonic adjacent set of the vertex
-	const edgeListTy& getMonotonicAdjSet(int vertex);
+	// add a new node with no edges
+	void addNode(int n);
 
 	// num_edges is the maximum number of edges per vertex
-	void populateGraph(int maxNumEdges);
+	void randomPopulate(int numNodes, int maxNumEdges);
 
 	// get the vertex based on the order (this is a) 
 	int getVertex(int orderIdx);
@@ -44,24 +42,25 @@ public:
 	int getOrder(int vertex);
 
 	// get entire order list 
-	const edgeListTy& getOrder();
+	const nodeListTy& getOrder();
+
+	// get the adjacent list of node n
+	nodeListTy getAdjSet(int n);
+
+	// get the list of monotonely adjacent nodes of n
+	nodeListTy getMonAdjSet(int n);
 
 	void printGraph();
-
-	// ----------------- requested methods -----------------
-	
-	void fill();
 
 private: 
 	using graphTy = std::map<int, nodeInfo>;
 
-	int num_verteces;
+	int numNodes;
 	graphTy graph;
-	edgeListTy order;
+	nodeListTy order;
 
 	// ------------------ private methods ------------------
 	
-    int randomEdge();
-	edgeListTy computeMonAdjSet(int vertex);
+    int randomNode(int min, int max);
 };
 
