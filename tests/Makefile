@@ -1,4 +1,4 @@
-dirs := graph_creation adjacent_set fill
+dirs := randomPopulate 
 
 test: $(dirs)
 

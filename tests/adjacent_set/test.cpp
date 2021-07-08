@@ -6,7 +6,6 @@ namespace my {
 namespace project {
 namespace {
 
-// The fixture for testing class Foo.
 class GraphTest : public ::testing::Test {
  protected:
 

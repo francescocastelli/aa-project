@@ -45,14 +45,21 @@ TEST_F(GraphTest, GraphPopoluateEdges) {
   // it through verteces
   for(int i=0; i<20; ++i)
   {
-	  auto edges = g[i];
+	  auto mAdj = g[i];
 
-	  // through verteces in edges of vertex i
-	  for(int j=0; j<edges.size(); ++j)
+	  // through adjacent list of vertex i
+	  for(int j=0; j<mAdj.size(); ++j)
 	  {
-		  auto edges_two = g[edges[j]];
-		  auto it = std::find(edges_two.begin(), edges_two.end(), i);
-		  EXPECT_FALSE(it == edges_two.end());
+		  auto w = mAdj[j];
+		  auto wEdges = g[w];
+		  auto wMadj = g.getMonotonicAdjSet(w);
+		  for (int h=0; h<mAdj.size(); ++h)
+		  {
+			  auto x = mAdj[h];
+			  auto it = std::find(wEdges.begin(), wEdges.end(), x);
+			  auto it2 = std::find(wMadj.begin(), wMadj.end(), x);
+			  EXPECT_TRUE(x == w || it != wEdges.end() || it2 != wMadj.end()); 
+		  }
 	  }
   }
 }
