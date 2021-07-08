@@ -1,4 +1,4 @@
-dirs := randomPopulate 
+dirs := randomPopulate fill
 
 all: test clean
 

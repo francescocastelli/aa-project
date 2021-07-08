@@ -1,4 +1,5 @@
 #include "../../include/graph.h"
+#include "../../include/fill.h"
 #include <gtest/gtest.h>
 #include <algorithm>
 
@@ -7,63 +8,69 @@ namespace project {
 namespace {
 
 // The fixture for testing class Foo.
-class GraphTest : public ::testing::Test {
- protected:
+class GraphTest : public ::testing::TestWithParam<std::pair<int, int>> {
 
+protected:
   GraphTest() {
 
   }
 
   ~GraphTest() override {
-     // You can do clean-up work that doesn't throw exceptions here.
   }
 
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
   void SetUp() override {
-     // Code here will be called immediately after the constructor (right
-     // before each test).
+	  numNodes = std::get<0>(GetParam());
+	  numEdges = std::get<1>(GetParam());;
+
+	  g.randomPopulate(numNodes, numEdges);
+	  fill(g);
+	  nodes = g.getNodeList();
   }
 
   void TearDown() override {
-     // Code here will be called immediately after each test (right
-     // before the destructor).
   }
 
-  // Class members declared here can be used by all tests in the test suite
-  // for Foo.
+  int numNodes;
+  int numEdges;
+  std::vector<int> nodes;
+  Graph g;
 };
 
-// Tests that the Graph::populateGraph() method create all the verteces in the 
-// right place.
-TEST_F(GraphTest, GraphPopoluateEdges) {
-  Graph g(20);
-  g.populateGraph(5);
-
-  g.fill();
-
+// after applying fill to g (randomly generated) we obtain g* (elimination graph). 
+// Since every elimination graph is a perfect elimination graph, the order of g* should be a 
+// perfect elimination order. 
+// This test checks that, after applying fill to g, the order of g* is a perfect elimination 
+// order ( alpha is a perfect el. order if v ->- w and v ->-x imply w -- x or w = x)
+TEST_P(GraphTest, GraphPopoluateEdges) {
   // it through verteces
-  for(int i=0; i<20; ++i)
+  for(auto const& v: nodes)
   {
-	  auto mAdj = g[i];
+	  // nodes monotonely adj to v
+	  auto mAdjV = g.getMonAdjSet(v);
 
-	  // through adjacent list of vertex i
-	  for(int j=0; j<mAdj.size(); ++j)
+	  // here we check the case of (v->- w and v->-x) = true
+	  // so if (w -- x or w == x) == true then we are good, else the order is not a 
+	  // perfect elimination order for sure.
+      // In the case of (v ->- w or v ->-x) = false we always have a perfect elimination order
+  	  for(int j=0; j<mAdjV.size(); ++j)
 	  {
-		  auto w = mAdj[j];
-		  auto wEdges = g[w];
-		  auto wMadj = g.getMonotonicAdjSet(w);
-		  for (int h=0; h<mAdj.size(); ++h)
+		  int w = mAdjV[j];
+		  auto wAdj = g.getAdjSet(w);
+		  for(int i = 0; i<mAdjV.size(); ++i)
 		  {
-			  auto x = mAdj[h];
-			  auto it = std::find(wEdges.begin(), wEdges.end(), x);
-			  auto it2 = std::find(wMadj.begin(), wMadj.end(), x);
-			  EXPECT_TRUE(x == w || it != wEdges.end() || it2 != wMadj.end()); 
+			  int x = mAdjV[i];
+			  ASSERT_TRUE(std::count(wAdj.begin(), wAdj.end(), x) == 1 || w == x);
 		  }
 	  }
   }
 }
 
+const std::pair<int, int> values[] = {std::make_pair(20, 5), std::make_pair(25, 10), 
+									  std::make_pair(5, 10), std::make_pair(50, 30)};
+
+INSTANTIATE_TEST_SUITE_P(nodesEdgesRange, 
+						 GraphTest, 
+						 testing::ValuesIn(values));
 }  // namespace
 }  // namespace project
 }  // namespace my
