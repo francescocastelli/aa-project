@@ -13,10 +13,15 @@ void Graph::addNode(int n)
 	++numNodes;
 }
 
+int Graph::getNodeNumber()
+{
+	return numNodes;
+}
+
 void Graph::addEdge(int n1, int n2)
 {
-	if (graph.count(n1) == 0) ++numNodes;
-	if (graph.count(n2) == 0) ++numNodes;
+	if (graph.count(n1) == 0) {++numNodes; addNode(n1);}
+	if (graph.count(n2) == 0) {++numNodes; addNode(n2);}
 
 	graph[n1].adjSet.push_back(n2);
 	graph[n2].adjSet.push_back(n1);
@@ -39,6 +44,14 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges)
 			if (node != i && nodeCount == 0)
 				addEdge(i, node);
 		}
+	
+	// delete disconnected nodes
+	for (int i=0; i<numNodes; ++i)
+		if (graph[i].adjSet.size() == 0)
+		{
+			graph.erase(i);
+			--numNodes;
+		}
 }
 
 // get the vertex based on the order (this is a) 
@@ -57,6 +70,16 @@ int Graph::getOrder(int vertex)
 const Graph::nodeListTy& Graph::getOrder()
 {
 	return order;
+}
+
+Graph::nodeListTy Graph::getNodeList()
+{
+	nodeListTy nodeList;
+
+	for(auto const& k: graph)
+		nodeList.push_back(k.first);
+
+	return nodeList;
 }
 
 Graph::nodeListTy Graph::getAdjSet(int n)

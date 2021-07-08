@@ -35,6 +35,10 @@ public:
 	// num_edges is the maximum number of edges per vertex
 	void randomPopulate(int numNodes, int maxNumEdges);
 
+	nodeListTy getNodeList();
+
+	int getNodeNumber();
+
 	// get the vertex based on the order (this is a) 
 	int getVertex(int orderIdx);
 
