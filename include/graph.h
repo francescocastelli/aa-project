@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <map>
 
@@ -46,7 +47,7 @@ public:
 	int getOrder(int vertex);
 
 	// get entire order list 
-	const nodeListTy& getOrder();
+	nodeListTy getOrder();
 
 	// get the adjacent list of node n
 	nodeListTy getAdjSet(int n);

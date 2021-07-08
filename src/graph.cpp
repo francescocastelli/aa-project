@@ -13,11 +13,6 @@ void Graph::addNode(int n)
 	++numNodes;
 }
 
-int Graph::getNodeNumber()
-{
-	return numNodes;
-}
-
 void Graph::addEdge(int n1, int n2)
 {
 	if (graph.count(n1) == 0) {++numNodes; addNode(n1);}
@@ -46,12 +41,24 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges)
 		}
 	
 	// delete disconnected nodes
+	int count = 0;
 	for (int i=0; i<numNodes; ++i)
 		if (graph[i].adjSet.size() == 0)
 		{
 			graph.erase(i);
-			--numNodes;
+			++count;
 		}
+
+	this->numNodes -=count;
+
+	// create random order for the nodes
+	order = std::move(getNodeList());
+    std::random_shuffle(order.begin(), order.end());
+}
+
+int Graph::getNodeNumber()
+{
+	return numNodes;
 }
 
 // get the vertex based on the order (this is a) 
@@ -67,7 +74,7 @@ int Graph::getOrder(int vertex)
 	return std::distance(order.begin(), it); 
 }
 
-const Graph::nodeListTy& Graph::getOrder()
+Graph::nodeListTy Graph::getOrder()
 {
 	return order;
 }
@@ -119,4 +126,3 @@ int Graph::randomNode(int min, int max)
 
 	return dist(rng);
 }
-
