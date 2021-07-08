@@ -1,5 +1,7 @@
 dirs := randomPopulate 
 
+all: test clean
+
 test: $(dirs)
 
 $(dirs):

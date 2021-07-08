@@ -81,7 +81,8 @@ TEST_P(GraphTest, GraphNoDuplicateEdges) {
 }
 
 TEST_P(GraphTest, ConnectedGraph) {
-  ASSERT_GT(g.getNodeNumber(), 1) << "graph should be connected, more than one node required";
+  ASSERT_NE(g.getNodeNumber(), 1)<<"graph should be connected, 0 or more than one node required";
+  ASSERT_EQ(g.getNodeNumber(), nodes.size());
 
   // it through verteces
   for(auto const& i: nodes)
@@ -89,12 +90,12 @@ TEST_P(GraphTest, ConnectedGraph) {
 	  auto edges = g.getAdjSet(i);
 	  EXPECT_TRUE(edges.size() > 0) << "node " << i << " has no adj nodes " 
 		  						    << "size: "<< edges.size()
-									<< "numNodes: "<< g.getNodeNumber();
+									<< " numNodes: "<< g.getNodeNumber();
   }
 }
 
 TEST_P(GraphTest, CorrectNumberOfNodes) {
-  EXPECT_EQ(g.getNodeNumber(), numNodes) << "number of nodes in g is not correct";
+  EXPECT_EQ(g.getNodeNumber(), nodes.size()) << "number of nodes in g is not correct";
 }
 
 const std::pair<int, int> values[] = {std::make_pair(20, 5), std::make_pair(25, 10), 

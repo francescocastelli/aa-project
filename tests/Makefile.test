@@ -7,7 +7,7 @@ rm := rm -f
 
 test: $(obj)
 	$(cc) -o test $(obj) graph.o $(lflags) 
-
+	
 %.o:  %.cpp 
 	$(cc) -c $< $(src) $(ccflags) 
 
