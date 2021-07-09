@@ -1,5 +1,8 @@
-#include "../include/graph.h"
+#include "graph.h"
 #include <algorithm>
+
+namespace graph_algorithms 
+{
 
 void fill(Graph &g)
 {
@@ -75,3 +78,4 @@ void fill(Graph &g)
 		}
 	}
 }
+} // namespace graph_algorithms
