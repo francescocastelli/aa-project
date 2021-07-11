@@ -22,11 +22,9 @@ private:
 	}
 
 public:
-	CellList(int numNodes) : cellV (numNodes)
+	CellList(int numNodes) : cellV (numNodes), cells (numNodes)
 	{
 	}
-
-	~CellList() = default;
 
 	void addEmptyCell() {cells.push_back({nullvalue, nullvalue, nullvalue, nullvalue});};
 
@@ -43,12 +41,11 @@ public:
 	static constexpr int nullvalue = -1;
 
 private:
+	// list of cell idx, indexed using a node 
+	std::vector<int> cellV;
 
 	// list of cell
 	std::vector<cellInfo> cells;
-
-	// list of cell idx, indexed using a node 
-	std::vector<int> cellV;
 };
 
 
@@ -148,5 +145,7 @@ void lexp(Graph& g)
 		for (const auto& h: fixlist)
 			cells.flag(h) = CellList::nullvalue;
 	}
+
+	g.setOrder(std::move(order));
 }
 } // namespace graph_algorithms

@@ -55,6 +55,8 @@ public:
 	// get the list of monotonely adjacent nodes of n
 	nodeListTy getMonAdjSet(int n);
 
+	void setOrder(nodeListTy order);
+
 	void printGraph();
 
 private: 
