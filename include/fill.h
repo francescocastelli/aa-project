@@ -8,7 +8,7 @@ void fill(Graph &g)
 {
 	// begin
 	int numNodes = g.getNodeNumber();
-	std::vector<std::vector<int>> monAdjSets(numNodes);
+	std::map<int, std::vector<int>> monAdjSets;
 	std::vector<bool> test(numNodes, false);
 
 	// make a copy of the monAdjSets for every node
