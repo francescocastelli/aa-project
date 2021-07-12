@@ -105,6 +105,11 @@ Graph::nodeListTy Graph::getMonAdjSet(int n)
 	return mAdj;
 }
 
+void Graph::setOrder(nodeListTy order)
+{
+	this->order = std::move(order);
+}
+
 void Graph::printGraph()
 {
 	for (int i=0; i<numNodes; ++i)

@@ -8,6 +8,8 @@ class CellList
 private:
 	struct cellInfo 
 	{
+		cellInfo () : flag (nullvalue), head (nullvalue), next (nullvalue), back (nullvalue) {}
+
 		// fields required by the algorithm
 		int flag; 
 		int head;
@@ -15,18 +17,12 @@ private:
 		int back;
 	};
 
-	cellInfo make_empty_cell()
-	{
-		cellInfo cell = {nullvalue, nullvalue, nullvalue, nullvalue};
-		return cell;
-	}
-
 public:
-	CellList(int numNodes) : cellV (numNodes), cells (numNodes)
+	CellList(int numNodes) : cells (numNodes)
 	{
 	}
 
-	void addEmptyCell() {cells.push_back({nullvalue, nullvalue, nullvalue, nullvalue});};
+	void addEmptyCell() {cells.emplace_back();}
 
 	// managing the cell list items
 	int& flag(int cellIdx) {return cells[cellIdx].flag;}
@@ -41,13 +37,12 @@ public:
 	static constexpr int nullvalue = -1;
 
 private:
-	// list of cell idx, indexed using a node 
-	std::vector<int> cellV;
+	// map of cell idx, indexed using a node 
+	std::map<int, int> cellV;
 
 	// list of cell
 	std::vector<cellInfo> cells;
 };
-
 
 void lexp(Graph& g)
 {
@@ -55,9 +50,10 @@ void lexp(Graph& g)
 	// order, represent alpha so we index it using number from 0 to order.size() 
 	std::vector<int> order (numNodes);
 	// represent alpha^-1 so we index it using the verteces
-	std::vector<int> inverseOrder (numNodes);
+	std::map<int, int> inverseOrder;
 	std::vector<int> fixlist;
 	auto nodes = g.getNodeList();
+	//std::vector<int> nodes = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     CellList cells (numNodes);	
 
@@ -72,7 +68,7 @@ void lexp(Graph& g)
 
 	for (auto const& v: nodes)
 	{
-		cells.addEmptyCell();
+		//cells.addEmptyCell();
 		cells.head(c) = v;
 		cells.cell(v) = c; cells.next(c-1) = c;
 		cells.flag(c) = 1;
@@ -87,7 +83,7 @@ void lexp(Graph& g)
 		while (cells.next(cells.head(0)) == CellList::nullvalue)
 		{
 			cells.head(0) = cells.head(cells.head(0));
-			cells.back(cells.head(0)) = 1;
+			cells.back(cells.head(0)) = 0;
 		}
 
 		// pick next vertex to number
@@ -146,6 +142,6 @@ void lexp(Graph& g)
 			cells.flag(h) = CellList::nullvalue;
 	}
 
-	g.setOrder(std::move(order));
+	g.setOrder(order);
 }
 } // namespace graph_algorithms
