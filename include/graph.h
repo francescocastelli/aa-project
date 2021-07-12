@@ -33,8 +33,12 @@ public:
 	// add a new node with no edges
 	void addNode(int n);
 
+	void removeNode(int n);
+
+	void removeEdge(int n1, int n2);
+
 	// num_edges is the maximum number of edges per vertex
-	void randomPopulate(int numNodes, int maxNumEdges);
+	void randomPopulate(int numNodes, int maxNumEdges, int seed = -1);
 
 	nodeListTy getNodeList();
 
@@ -52,8 +56,14 @@ public:
 	// get the adjacent list of node n
 	nodeListTy getAdjSet(int n);
 
-	// get the list of monotonely adjacent nodes of n
-	nodeListTy getMonAdjSet(int n);
+	std::map<int, nodeListTy> computeMonAdjSet();
+
+	nodeListTy computeMonAdjSet(int n);
+
+	// take in input a map of monotonely adj set and 
+	// computes the difference wrt to ones of the current graph
+	// then add the new edges
+	void addNewEdges(std::map<int, nodeListTy> monAdjSet);
 
 	void setOrder(nodeListTy order);
 
@@ -63,11 +73,17 @@ private:
 	using graphTy = std::map<int, nodeInfo>;
 
 	int numNodes;
+	// nodeList 
+	nodeListTy nodeList;
+	// actual graph
 	graphTy graph;
+	// alpha
 	nodeListTy order;
+	// alpha^-1
+	std::map<int, int> inverseOrder;
 
 	// ------------------ private methods ------------------
 	
-    int randomNode(int min, int max);
+    int randomNode(int min, int max, int seed);
 };
 
