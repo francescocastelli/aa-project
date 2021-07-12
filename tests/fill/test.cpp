@@ -23,7 +23,9 @@ protected:
 	  numEdges = std::get<1>(GetParam());;
 
 	  g.randomPopulate(numNodes, numEdges);
-	  fill(g);
+	  auto monAdjSet = g.computeMonAdjSet();
+	  auto newMonAdjSet = graph_algorithms::fill(g, std::move(monAdjSet));
+	  g.addNewEdges(newMonAdjSet);
 	  nodes = g.getNodeList();
   }
 
@@ -46,7 +48,7 @@ TEST_P(GraphTest, GraphPopoluateEdges) {
   for(auto const& v: nodes)
   {
 	  // nodes monotonely adj to v
-	  auto mAdjV = g.getMonAdjSet(v);
+	  auto mAdjV = g.computeMonAdjSet(v);
 
 	  // here we check the case of (v->- w and v->-x) = true
 	  // so if (w -- x or w == x) == true then we are good, else the order is not a 

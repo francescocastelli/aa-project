@@ -101,7 +101,7 @@ TEST_P(GraphTest, CheckMonAdjSet) {
   // it through verteces
   for(auto const& i: nodes)
   {
-	  auto mAdjSet = g.getMonAdjSet(i);
+	  auto mAdjSet = g.computeMonAdjSet(i);
 	  auto adjSet = g.getAdjSet(i);
 	  // through verteces in edges of vertex i
 	  for(int j=0; j<mAdjSet.size(); ++j)

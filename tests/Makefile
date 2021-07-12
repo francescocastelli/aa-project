@@ -1,4 +1,4 @@
-dirs := randomPopulate fill
+dirs := randomPopulate fill lexp
 
 all: test clean
 
