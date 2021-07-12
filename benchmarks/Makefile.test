@@ -1,0 +1,15 @@
+cc := g++
+ccflags := -std=c++11 -isystem benchmark/include -Lbenchmark/build/src -O3 
+lflags := -lbenchmark -lpthread 
+src := ../../src/graph.cpp
+obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+rm := rm -f
+
+benchmark: $(obj)
+	$(cc) -o benchmark $(obj) graph.o $(lflags) 
+	
+%.o:  %.cpp 
+	$(cc) -c $< $(src) $(ccflags) 
+
+clean: 
+	$(rm) *.o
