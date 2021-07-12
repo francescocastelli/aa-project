@@ -52,8 +52,8 @@ void lexp(Graph& g)
 	// represent alpha^-1 so we index it using the verteces
 	std::map<int, int> inverseOrder;
 	std::vector<int> fixlist;
-	auto nodes = g.getNodeList();
-	//std::vector<int> nodes = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+	//auto nodes = g.getNodeList();
+	std::vector<int> nodes = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     CellList cells (numNodes);	
 

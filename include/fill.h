@@ -4,19 +4,13 @@
 namespace graph_algorithms 
 {
 
-void fill(Graph &g)
+std::map<int, std::vector<int>> fill(Graph &g, std::map<int, std::vector<int>> monAdjSetP)
 {
 	// begin
 	int numNodes = g.getNodeNumber();
-	std::map<int, std::vector<int>> monAdjSets;
 	std::vector<bool> test(numNodes, false);
-
-	// make a copy of the monAdjSets for every node
-	auto nodes = g.getNodeList();
-	for (auto const& n: nodes)
-	{
-		monAdjSets[n] = g.getMonAdjSet(n);
-	}
+	auto monAdjSet = std::move(monAdjSetP);
+	auto nodes = std::move(g.getNodeList());
 
 	// loop
 	int k, v, size;
@@ -27,15 +21,16 @@ void fill(Graph &g)
 		v = g.getVertex(i); 
 
 		// dup 
-		for (int j=0; j<monAdjSets[v].size(); ++j)
+		for (int j=0; j<monAdjSet[v].size(); ++j)
 		{
-			int w = monAdjSets[v][j];
+			int w = monAdjSet[v][j];
 			int wOrder = g.getOrder(w);
 			
 			if (test[wOrder]) 	
 			{
-					monAdjSets[v].erase(monAdjSets[v].begin() + j);
-					--j;
+				std::swap(monAdjSet[v][j], monAdjSet[v].back());
+				monAdjSet[v].pop_back();
+				--j;
 			}
 			else
 			{
@@ -49,10 +44,10 @@ void fill(Graph &g)
 		int m = g.getVertex(k);
 
 		// add 
-		size = monAdjSets[v].size();
+		size = monAdjSet[v].size();
 		for (int j=0; j<size; ++j)
 		{
-			int w = monAdjSets[v][j];
+			int w = monAdjSet[v][j];
 			// reset the test vector
 			test[g.getOrder(w)] = false;
 
@@ -60,22 +55,11 @@ void fill(Graph &g)
 			// lemma 4 page 11
 			if (w != m) 
 			{
-				monAdjSets[m].push_back(w);
+				monAdjSet[m].push_back(w);
 			}
 		}
 	}
 	
-	for (auto const& n: nodes)
-	{
-		auto originalAdj = g.getMonAdjSet(n);
-		for (int j=0; j<monAdjSets[n].size(); ++j)
-		{   
-			int w = monAdjSets[n][j];
-			int originalCount = std::count(originalAdj.begin(), originalAdj.end(), w);
-
-			if (originalCount == 0)
-				g.addEdge(n, w);
-		}
-	}
+	return monAdjSet;
 }
 } // namespace graph_algorithms
