@@ -8,7 +8,7 @@ namespace my {
 namespace project {
 namespace {
 
-class GraphTest : public ::testing::TestWithParam<std::pair<int, int>> {
+class GraphTest : public ::testing::Test {
 
 protected:
   GraphTest() {
@@ -19,37 +19,65 @@ protected:
   }
 
   void SetUp() override {
-	  numNodes = std::get<0>(GetParam());
-	  numEdges = std::get<1>(GetParam());;
-
-	  g.randomPopulate(numNodes, numEdges);
-	  graph_algorithms::lexp(g);
   }
-
-  void TearDown() override {
-  }
-
-  int numNodes;
-  int numEdges;
-  std::vector<int> order;
-  Graph g;
 };
 
-TEST_P(GraphTest, CheckLexp) {
-  auto newOrder = g.getOrder();
+TEST_F(GraphTest, Figure4) {
+	Graph g;
+	std::vector<int> baselineOrder = {1, 3, 4, 5, 2, 9, 8, 7, 6, 10};
 
-  for(int i=0; i<order.size(); ++i)
-  {	
-	  ASSERT_TRUE(order[i] == newOrder[i]) << "original: " << order[i] << " - lexp: " << newOrder[i];
-  }
+	for (int i=10; i>0; --i)
+	{
+		g.addNode(i);
+	}
+
+	g.addEdge(1, 3);
+	g.addEdge(1, 5);
+	g.addEdge(3, 5);
+	g.addEdge(3, 4);
+	g.addEdge(3, 9);
+	g.addEdge(4, 5);
+	g.addEdge(4, 9);
+	g.addEdge(9, 5);
+	g.addEdge(9, 10);
+	g.addEdge(8, 5);
+	g.addEdge(8, 10);
+	g.addEdge(8, 9);
+	g.addEdge(2, 6);
+	g.addEdge(2, 7);
+	g.addEdge(7, 6);
+	g.addEdge(7, 10);
+	g.addEdge(6, 10);
+
+	graph_algorithms::lexp(g);
+
+	auto order = g.getOrder();
+	for(int i=0; i<order.size(); ++i)
+		ASSERT_EQ(order[i], baselineOrder[i]);
 }
 
-const std::pair<int, int> values[] = {std::make_pair(20, 5), std::make_pair(25, 10), 
-									  std::make_pair(5, 10), std::make_pair(50, 30)};
+TEST_F(GraphTest, Figure3) {
+	Graph g;
+	std::vector<int> baselineOrder = {1, 2, 3, 4, 5, 6};
 
-INSTANTIATE_TEST_SUITE_P(nodesEdgesRange, 
-						 GraphTest, 
-						 testing::ValuesIn(values));
+	for (int i=1; i<7; ++i)
+		g.addNode(i);
+
+	g.addEdge(1, 3);
+	g.addEdge(1, 4);
+	g.addEdge(2, 3);
+	g.addEdge(2, 5);
+	g.addEdge(3, 6);
+	g.addEdge(4, 6);
+	g.addEdge(5, 6);
+
+	graph_algorithms::lexp(g);
+
+	auto order = g.getOrder();
+	for(int i=0; i<order.size(); ++i)
+		ASSERT_EQ(order[i], baselineOrder[i]);
+}
+
 }  // namespace
 }  // namespace project
 }  // namespace my

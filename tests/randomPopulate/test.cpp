@@ -21,6 +21,11 @@ protected:
 	  numEdges = std::get<1>(GetParam());;
 
 	  g.randomPopulate(numNodes, numEdges);
+	  std::vector<int> order = std::move(g.getNodeList());
+	  // create random order for the nodes
+	  std::random_shuffle(order.begin(), order.end());
+	  g.setOrder(std::move(order));
+
 	  nodes = g.getNodeList();
   }
 

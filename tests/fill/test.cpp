@@ -23,6 +23,11 @@ protected:
 	  numEdges = std::get<1>(GetParam());;
 
 	  g.randomPopulate(numNodes, numEdges);
+	  std::vector<int> order = std::move(g.getNodeList());
+	  // create random order for the nodes
+	  std::random_shuffle(order.begin(), order.end());
+	  g.setOrder(std::move(order));
+
 	  auto monAdjSet = g.computeMonAdjSet();
 	  auto newMonAdjSet = graph_algorithms::fill(g, std::move(monAdjSet));
 	  g.addNewEdges(newMonAdjSet);
