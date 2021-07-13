@@ -26,11 +26,10 @@ void Graph::addEdge(int n1, int n2)
 
 void Graph::removeNode(int n)
 {
-	graph.erase(n);
-
 	for (auto const& adjN : graph[n].adjSet)
 		removeEdge(n, adjN);
 
+	graph.erase(n);
 	nodeList.erase(std::remove(nodeList.begin(), nodeList.end(), n), nodeList.end());
 	--numNodes;
 }
@@ -79,17 +78,6 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges, int seed)
 	for (int i=0; i<numNodes; ++i)
 		if (graph[i].adjSet.size() == 0)
 			removeNode(i);
-
-	// create random order for the nodes
-	order = std::move(getNodeList());
-    std::random_shuffle(order.begin(), order.end());
-
-	// create inverse order (alpha^-1) from order
-	for (int i=0; i<order.size(); ++i)
-		inverseOrder[order[i]] = i;
-
-	// finally pre compute the monAdjSet for each node
-	computeMonAdjSet();
 }
 
 // get the vertex based on the order (this is a) 
@@ -202,12 +190,12 @@ void Graph::reset()
 
 void Graph::printGraph() const
 {
-	for (int i=0; i<numNodes; ++i)
+	for (auto const& n: nodeList)
 	{
-		std::cout << "v: " << i << '\n';
+		std::cout << "v: " << n << '\n';
 		std::cout << "	edges: ";
-		for (int j=0; j<graph.at(i).adjSet.size(); ++j)
-			std::cout <<  " [" << graph.at(i).adjSet[j] << "] ";
+		for (int j=0; j<graph.at(n).adjSet.size(); ++j)
+			std::cout <<  " [" << graph.at(n).adjSet[j] << "] ";
 
 		std::cout << "\n";
 	}
