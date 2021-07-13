@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-Graph::Graph() : numNodes (0)
+Graph::Graph() : numNodes (0), numEdges(0)
 {
 }
 
@@ -21,11 +21,16 @@ void Graph::addEdge(int n1, int n2)
 
 	graph[n1].adjSet.push_back(n2);
 	graph[n2].adjSet.push_back(n1);
+	++numEdges;
 }
 
 void Graph::removeNode(int n)
 {
 	graph.erase(n);
+
+	for (auto const& adjN : graph[n].adjSet)
+		removeEdge(n, adjN);
+
 	nodeList.erase(std::remove(nodeList.begin(), nodeList.end(), n), nodeList.end());
 	--numNodes;
 }
@@ -37,6 +42,18 @@ void Graph::removeEdge(int n1, int n2)
 
 	graph[n2].adjSet.erase(std::remove(graph[n2].adjSet.begin(), 
 									   graph[n2].adjSet.end(), n1), graph[n2].adjSet.end());
+
+	--numEdges;
+}
+
+int Graph::getNodeNumber() const
+{
+	return numNodes;
+}
+
+int Graph::getEdgeNumber() const 
+{
+	return numEdges;
 }
 
 // num_edges is the maximum number of edges per vertex
@@ -75,57 +92,52 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges, int seed)
 	computeMonAdjSet();
 }
 
-int Graph::getNodeNumber()
-{
-	return numNodes;
-}
-
 // get the vertex based on the order (this is a) 
-int Graph::getVertex(int orderIdx) 
+int Graph::getVertex(int orderIdx) const
 {
 	return order[orderIdx];	
 }
 
 // get the order based on the vertex (this is a^-1) 
-int Graph::getOrder(int vertex) 
+int Graph::getOrder(int vertex) const 
 {
-	return inverseOrder[vertex];
+	return inverseOrder.at(vertex);
 }
 
-Graph::nodeListTy Graph::getOrder()
+Graph::nodeListTy Graph::getOrder() const
 {
 	return order;
 }
 
-Graph::nodeListTy Graph::getNodeList()
+Graph::nodeListTy Graph::getNodeList() const
 {
 	return nodeList;
 }
 
-Graph::nodeListTy Graph::getAdjSet(int n)
+Graph::nodeListTy Graph::getAdjSet(int n) const
 {
-	return graph[n].adjSet;
+	return graph.at(n).adjSet;
 }
 
-std::map<int, Graph::nodeListTy> Graph::computeMonAdjSet()
+std::map<int, Graph::nodeListTy> Graph::computeMonAdjSet() const
 {
 	std::map<int, nodeListTy> monAdjSet;
 
 	for (auto const& n: nodeList) 
-		for (int i=0; i<graph[n].adjSet.size(); ++i)
-			if (getOrder(n) < getOrder(graph[n].adjSet[i])) 
-				monAdjSet[n].push_back(graph[n].adjSet[i]);
+		for (int i=0; i<graph.at(n).adjSet.size(); ++i)
+			if (getOrder(n) < getOrder(graph.at(n).adjSet[i])) 
+				monAdjSet[n].push_back(graph.at(n).adjSet[i]);
 
 	return monAdjSet;
 }
 
-Graph::nodeListTy Graph::computeMonAdjSet(int n)
+Graph::nodeListTy Graph::computeMonAdjSet(int n) const
 {
 	nodeListTy monAdjSet;
 
-	for (int i=0; i<graph[n].adjSet.size(); ++i)
-		if (getOrder(n) < getOrder(graph[n].adjSet[i])) 
-			monAdjSet.push_back(graph[n].adjSet[i]);
+	for (int i=0; i<graph.at(n).adjSet.size(); ++i)
+		if (getOrder(n) < getOrder(graph.at(n).adjSet[i])) 
+			monAdjSet.push_back(graph.at(n).adjSet[i]);
 
 	return monAdjSet;
 }
@@ -148,6 +160,27 @@ void Graph::addNewEdges(std::map<int, Graph::nodeListTy> monAdjSet)
 	}
 }
 
+int Graph::countNewEdges(std::map<int, Graph::nodeListTy> monAdjSet)
+{
+	int count = 0;
+	auto newMonAdjSet = std::move(monAdjSet);
+
+	for (auto const& n: nodeList)
+	{
+		auto originalAdj = std::move(computeMonAdjSet(n));
+		for (int j=0; j<newMonAdjSet[n].size(); ++j)
+		{   
+			int w = newMonAdjSet[n][j];
+			int originalCount = std::count(originalAdj.begin(), originalAdj.end(), w);
+
+			if (originalCount == 0)
+				++count;
+		}
+	}
+
+	return count;
+}
+
 void Graph::setOrder(nodeListTy order)
 {
 	this->order = std::move(order);
@@ -157,14 +190,24 @@ void Graph::setOrder(nodeListTy order)
 		inverseOrder[this->order[i]] = i;
 }
 
-void Graph::printGraph()
+void Graph::reset()
+{
+	numNodes = 0;
+	numEdges = 0;
+	nodeList.clear();
+	order.clear();
+	graph.clear();
+	inverseOrder.clear();
+}
+
+void Graph::printGraph() const
 {
 	for (int i=0; i<numNodes; ++i)
 	{
 		std::cout << "v: " << i << '\n';
 		std::cout << "	edges: ";
-		for (int j=0; j<graph[i].adjSet.size(); ++j)
-			std::cout <<  " [" << graph[i].adjSet[j] << "] ";
+		for (int j=0; j<graph.at(i).adjSet.size(); ++j)
+			std::cout <<  " [" << graph.at(i).adjSet[j] << "] ";
 
 		std::cout << "\n";
 	}
@@ -172,13 +215,6 @@ void Graph::printGraph()
 
 int Graph::randomNode(int min, int max, int seed)
 {
-	if (seed != -1)
-	{
-		std::mt19937 rng(seed);
-		std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-		return dist(rng);
-	}
-
 	std::random_device dev;
 	std::mt19937 rng(dev());
 	std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);

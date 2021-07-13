@@ -37,42 +37,49 @@ public:
 
 	void removeEdge(int n1, int n2);
 
+	int getNodeNumber() const;
+
+	int getEdgeNumber() const;
+
 	// num_edges is the maximum number of edges per vertex
 	void randomPopulate(int numNodes, int maxNumEdges, int seed = -1);
 
-	nodeListTy getNodeList();
-
-	int getNodeNumber();
+	nodeListTy getNodeList() const;
 
 	// get the vertex based on the order (this is a) 
-	int getVertex(int orderIdx);
+	int getVertex(int orderIdx) const;
 
 	// get the order based on the vertex (this is a^-1) 
-	int getOrder(int vertex);
+	int getOrder(int vertex) const;
 
 	// get entire order list 
-	nodeListTy getOrder();
+	nodeListTy getOrder() const;
 
 	// get the adjacent list of node n
-	nodeListTy getAdjSet(int n);
+	nodeListTy getAdjSet(int n) const;
 
-	std::map<int, nodeListTy> computeMonAdjSet();
+	std::map<int, nodeListTy> computeMonAdjSet() const;
 
-	nodeListTy computeMonAdjSet(int n);
+	nodeListTy computeMonAdjSet(int n) const;
 
 	// take in input a map of monotonely adj set and 
 	// computes the difference wrt to ones of the current graph
 	// then add the new edges
 	void addNewEdges(std::map<int, nodeListTy> monAdjSet);
 
+	int countNewEdges(std::map<int, nodeListTy> monAdjSet);
+
 	void setOrder(nodeListTy order);
 
-	void printGraph();
+	void reset();
+
+	void printGraph() const;
 
 private: 
 	using graphTy = std::map<int, nodeInfo>;
 
 	int numNodes;
+	int numEdges;
 	// nodeList 
 	nodeListTy nodeList;
 	// actual graph
