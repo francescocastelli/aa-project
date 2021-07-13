@@ -4,12 +4,13 @@
 namespace graph_algorithms 
 {
 
-std::map<int, std::vector<int>> fill(Graph &g, std::map<int, std::vector<int>> monAdjSetP)
+std::map<int, std::vector<int>> fill(const Graph& g, std::map<int, std::vector<int>> monAdjSetP)
 {
 	// begin
+	auto monAdjSet = std::move(monAdjSetP);
+
 	int numNodes = g.getNodeNumber();
 	std::vector<bool> test(numNodes, false);
-	auto monAdjSet = std::move(monAdjSetP);
 	auto nodes = std::move(g.getNodeList());
 
 	// loop
