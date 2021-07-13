@@ -97,6 +97,15 @@ TEST_P(GraphTest, CorrectNumberOfNodes) {
   EXPECT_EQ(g.getNodeNumber(), nodes.size()) << "number of nodes in g is not correct";
 }
 
+TEST_P(GraphTest, CorrectNumberOfEdges) {
+	int sum = 0;
+
+	for (auto const& i: nodes)
+		sum += g.getAdjSet(i).size();
+
+	EXPECT_EQ(g.getEdgeNumber(), sum/2) << "number of edges in g is not correct";
+}
+
 TEST_P(GraphTest, CheckMonAdjSet) {
   // it through verteces
   for(auto const& i: nodes)
