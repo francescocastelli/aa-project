@@ -11,6 +11,13 @@ static void BM_fill(benchmark::State& state)
 	std::map<int, std::vector<int>> outputSet;	
 
 	g.randomPopulate(state.range(0), state.range(1), 1);
+
+	// create random order for the nodes
+	std::vector<int> order = std::move(g.getNodeList());
+    std::random_shuffle(order.begin(), order.end());
+	g.setOrder(std::move(order));
+
+	// compute the monotonely adj sets of the graph
 	auto monAdjSet = g.computeMonAdjSet();
 
 	// n is the number of nodes of the graph g

@@ -1,4 +1,4 @@
-dirs := fill 
+dirs := fill lexp
 
 all: test clean
 
