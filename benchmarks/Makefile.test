@@ -1,5 +1,5 @@
-cc := g++
-ccflags := -std=c++11 -isystem benchmark/include -Lbenchmark/build/src -O3 
+cc := clang++
+ccflags := -std=c++11 -isystem benchmark/include -Lbenchmark/build/src -O3
 lflags := -lbenchmark -lpthread 
 src := ../../src/graph.cpp
 obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
