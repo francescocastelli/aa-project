@@ -1,5 +1,6 @@
 #include "graph.h"
-
+#include <algorithm>
+#include <math.h>
 
 namespace graph_algorithms 
 {
@@ -139,17 +140,29 @@ void lexm(Graph &g)
 			}
 
 		// sort
+		/*
 		std::vector<uint32_t> radixLabels(unnumbered.begin(), unnumbered.end());
 		_radix_sort(radixLabels);
 		for (int j=0; j<radixLabels.size(); ++j)
 			unnumbered[j] = (float)radixLabels[j];
+		*/
+		std::sort(unnumbered.begin(), unnumbered.end());
+
+		// reassign l(w) values to be integers from 1 to k, redefining k appropriately
+		std::vector<float> bins (unnumbered.size());
+		if (bins.size() != 0) bins[0] = 1.0f;
+		float count = 1.0f;
+
+		for (int j=1; j<unnumbered.size(); ++j)
+		{
+			if (unnumbered[j] != unnumbered[j-1])
+				++count;
+
+			bins[j] = count;
+		}
+
+		k = count;
+		unnumbered = bins;
 	}
-
-
-
-
 }
-
-
-
 } // namespace graph_algorithms
