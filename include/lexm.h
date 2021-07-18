@@ -1,69 +1,23 @@
 #include "graph.h"
 #include <algorithm>
 #include <math.h>
+#include <unordered_map>
 
 namespace graph_algorithms 
 {
 
-int _counting_sort(std::vector<uint32_t> &a, int digitIndex)
-{
-	std::vector<uint32_t> b (a.size(), 0);
-	//always 10 bc we consider one digit at the time
-	std::vector<int> c (10, 0); 
-	
-	for (auto i : a)
-		c[(i/digitIndex) % 10]+=1;
-
-	for (auto i = 1; i<10; ++i)
-		c[i] += c[i-1];
-
-	for (int i = b.size()-1; i>=0; --i)
-	{
-		b[c[(a[i]/digitIndex) % 10]-1] = a[i];
-		--c[(a[i]/digitIndex) % 10];
-	}
-
-	a = std::move(b);
-	return 0;
-}
-
-int _numDigits(int number)
-{
-	int digits = 0;
-	if (number < 0) digits = 1; 
-	while (number) {
-		number /= 10;
-		digits++;
-	}
-	return digits;
-}
-
-int _radix_sort(std::vector<uint32_t> &v)
-{
-   int max = *std::max_element(v.begin(), v.end());
-   int digitNum = _numDigits(max);
-   int digitIndex = 1;
-
-   for (auto i = 1; i <= digitNum; ++i)
-   {
-		_counting_sort(v, digitIndex);        
-		digitIndex *= 10;
-   }
-
-   return 0;
-}
-
 void lexm(Graph &g)
 {
-
 	int numNodes = g.getNodeNumber();
 	auto nodes = g.getNodeList();
 
-	// map of labels, each vertex as an integer associated
-	//std::map<int, float> l;
 	// reach is indexed by labels
 	std::map<int, std::vector<int>> reach;
-	std::vector<float> unnumbered;
+	// vector of nodes, always ordered in increasing order 
+	std::vector<int> unnumbered;
+	// map of labels, indexed by nodes
+	std::unordered_map<int, float> labels;
+
 	std::map<int, bool> unreached;
 
 	std::vector<int> order (numNodes);
@@ -72,9 +26,9 @@ void lexm(Graph &g)
 	// begin 
 	for (auto const& n : nodes)
 	{
-		//l[n] = 1.0f;
+		labels[n] = 1.0f;
 		inverseOrder[n] = 0;
-		unnumbered.push_back(1.0f);
+		unnumbered.push_back(n);
 		unreached[n] = true;
 	}
 
@@ -97,7 +51,7 @@ void lexm(Graph &g)
 
 		// we need to do this because we are searching for a chain like
 		// [v, v2, ..., v_k+1 = w] with vj unnumbered and l(vj) < l(w) for j=2,...,k
-		for (int j=0; j<k; ++j)
+		for (int j=1; j<=k; ++j)
 			reach[j].clear();
 
 		// mark all the unnumbered vertices unreached
@@ -108,16 +62,16 @@ void lexm(Graph &g)
 			// check that w is unnumbered
 			if (inverseOrder[w] == 0)
 			{
-				reach[unnumbered[w]].push_back(w);
+				reach[labels[w]].push_back(w);
 				// mark w reached
 				unreached[w] = false;
 
-				unnumbered[w]  = unnumbered[w] + 0.5f;
+				labels[w]  = labels[w] + 0.5f;
 				// mark v, w as edge on g*
 			}
 
 		// search
-		for (int j=k-1; j>=0; --j)
+		for (int j=k; j>0; --j)
 			while (!reach[j].empty())
 			{
 				// delete a vertex w from reach(k)
@@ -131,8 +85,8 @@ void lexm(Graph &g)
 						unreached[z] = false;
 						if (unnumbered[z] < j) 
 						{
-							reach[unnumbered[z]].push_back(z);
-							unnumbered[z]  = unnumbered[z] + 0.5f;
+							reach[labels[z]].push_back(z);
+							labels[z]  = labels[z] + 0.5f;
 							// mark v, z as an edge of g*
 						}
 						else reach[j].push_back(z);
@@ -140,29 +94,36 @@ void lexm(Graph &g)
 			}
 
 		// sort
-		/*
-		std::vector<uint32_t> radixLabels(unnumbered.begin(), unnumbered.end());
-		_radix_sort(radixLabels);
-		for (int j=0; j<radixLabels.size(); ++j)
-			unnumbered[j] = (float)radixLabels[j];
-		*/
-		std::sort(unnumbered.begin(), unnumbered.end());
+		std::sort(unnumbered.begin(), unnumbered.end(), 
+				  [&labels](const int &l, const int &r) 
+				  {
+				  		return labels[l] < labels[r];
+				  });
 
 		// reassign l(w) values to be integers from 1 to k, redefining k appropriately
-		std::vector<float> bins (unnumbered.size());
-		if (bins.size() != 0) bins[0] = 1.0f;
-		float count = 1.0f;
-
-		for (int j=1; j<unnumbered.size(); ++j)
+		std::map<float, std::vector<int>> bins;
+		for (auto const& n: unnumbered)
 		{
-			if (unnumbered[j] != unnumbered[j-1])
-				++count;
-
-			bins[j] = count;
+			float l = labels[n];
+			bins[l].push_back(n);
 		}
 
-		k = count;
-		unnumbered = bins;
+		// set the new k
+		k = bins.size();
+
+		// set the new labels
+		// the cycles below iterate over all the unnumbered verteces, 
+		// complexity is linear in the number of them 
+		float count = 1.0f;
+		for (auto const& b: bins)
+		{
+			for(auto const& n: b.second)
+				labels[n] = count;
+
+			++count;
+		}
 	}
+
+	g.setOrder(order);
 }
 } // namespace graph_algorithms
