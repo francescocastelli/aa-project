@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 class Graph 
 {
@@ -76,7 +77,7 @@ public:
 	void printGraph() const;
 
 private: 
-	using graphTy = std::map<int, nodeInfo>;
+	using graphTy = std::unordered_map<int, nodeInfo>;
 
 	int numNodes;
 	int numEdges;
@@ -87,7 +88,7 @@ private:
 	// alpha
 	nodeListTy order;
 	// alpha^-1
-	std::map<int, int> inverseOrder;
+	std::unordered_map<int, int> inverseOrder;
 
 	// ------------------ private methods ------------------
 	

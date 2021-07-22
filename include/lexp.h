@@ -38,7 +38,7 @@ public:
 
 private:
 	// map of cell idx, indexed using a node 
-	std::map<int, int> cellV;
+	std::unordered_map<int, int> cellV;
 
 	// list of cell
 	std::vector<cellInfo> cells;
@@ -50,7 +50,7 @@ void lexp(Graph& g)
 	// order, represent alpha so we index it using number from 0 to order.size() 
 	std::vector<int> order (numNodes);
 	// represent alpha^-1 so we index it using the verteces
-	std::map<int, int> inverseOrder;
+	std::unordered_map<int, int> inverseOrder;
 	std::vector<int> fixlist;
 	//auto nodes = g.getNodeList();
 	std::vector<int> nodes = std::move(g.getNodeList()); 

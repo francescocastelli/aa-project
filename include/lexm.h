@@ -12,7 +12,7 @@ void lexm(Graph &g)
 	auto nodes = g.getNodeList();
 
 	// reach is indexed by labels
-	std::map<int, std::vector<int>> reach;
+	std::unordered_map<int, std::vector<int>> reach;
 	// vector of nodes, always ordered in increasing order 
 	std::vector<int> unnumbered;
 	// map of labels, indexed by nodes
@@ -21,7 +21,7 @@ void lexm(Graph &g)
 	std::map<int, bool> unreached;
 
 	std::vector<int> order (numNodes);
-	std::map<int, int> inverseOrder;
+	std::unordered_map<int, int> inverseOrder;
 
 	// begin 
 	for (auto const& n : nodes)
@@ -92,7 +92,7 @@ void lexm(Graph &g)
 						else reach[j].push_back(z);
 					}
 			}
-
+		// end search
 		// sort
 		std::sort(unnumbered.begin(), unnumbered.end(), 
 				  [&labels](const int &l, const int &r) 
