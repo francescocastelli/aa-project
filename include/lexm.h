@@ -71,7 +71,7 @@ void lexm(Graph &g)
 			}
 
 		// search
-		for (int j=k; j>0; --j)
+		for (int j=1; j<=k; ++j)
 			while (!reach[j].empty())
 			{
 				// delete a vertex w from reach(k)
@@ -83,7 +83,7 @@ void lexm(Graph &g)
 					{
 						// mark z reached
 						unreached[z] = false;
-						if (unnumbered[z] < j) 
+						if (labels[z] > j) 
 						{
 							reach[labels[z]].push_back(z);
 							labels[z]  = labels[z] + 0.5f;
