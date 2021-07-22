@@ -1,4 +1,4 @@
-dirs := randomPopulate fill lexp
+dirs := randomPopulate fill lexp lexm
 
 all: test clean
 
