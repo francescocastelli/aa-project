@@ -1,0 +1,17 @@
+cc := clang++
+ccflags := -O3 -g
+src := ../../../src/graph.cpp
+obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+rm := rm -f
+out_name := benchmark_space
+
+benchmark: $(obj)
+	$(cc) -o $(out_name) $(obj) graph.o  
+	valgrind --tool=massif --massif-out-file=mem_report ./$(out_name)
+	ms_print mem_report | head -30
+	
+%.o:  %.cpp 
+	$(cc) -c $< $(src) $(ccflags) 
+
+clean: 
+	$(rm) *.o

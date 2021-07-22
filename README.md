@@ -7,6 +7,12 @@ v ->- w and v ->- x ----> w --- x or w == x
 
 So a perfect elimination order defines the order in which we can eliminate verteces from a graph without adding new edges in the elimination process.
 
+## Minimal elimination order 
+
+An ordering alpha is a minimal elimination order of G if no other ordering beta satisfies F(G_alpha) include in F(G_beta), where the containment is proper.
+
+If a graph is a perfect elimination graph any minimal order is perfect.
+
 ## 	BFS and perfect orderings
 
 A BFS applyed to a graph G as the effect of generating a spanning tree of G and to partition the verticies of G into levels.

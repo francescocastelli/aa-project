@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <algorithm>
 
 namespace graph_algorithms
 {
