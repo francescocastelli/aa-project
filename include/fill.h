@@ -4,7 +4,35 @@
 namespace graph_algorithms 
 {
 
-std::map<int, std::vector<int>> fill(const Graph& g, std::map<int, std::vector<int>> monAdjSetP)
+/* parameters :
+ * 		graph g, the graph on which we apply fill 
+ * 		monAdjSetP, map that contains all the monotonely adj sets for each node of the graph g 
+ * 
+ * return : 
+ *		map that contains the new monotonely adj sets for each node, after fill algorithm is 
+ *		applyed
+ *
+ * 	pseudo-code: 
+ *
+ * 		The fill algorithm can be used on graph with an order already set, and it will compute
+ * 		the fill-in set of this graph.
+ *
+ * 		1. loop over the order (from 1 to n-1) and get the current vertex v
+ *         1.a get the node with minimum oder among the monotonely adj nodes of v (called m) 
+ *         2.a add all the nodes in the monAdjSet of v to the monAdjSet of m 
+ *  
+ *  	In oder to make fill fast, the dup loop is added in this implementation. This loop is 
+ *  	responsible for deleting all the duplicates in the monAdjSets so that they will not 
+ *  	contains to many redundant elements
+ *
+ *  Complexity:
+ *  	n is the number of nodes 
+ *  	e' is the total number of edges of the elimination graph of g (g*)
+ *
+ *  	time complexity: O(n+e')
+ */
+std::unordered_map<int, std::vector<int>> fill(const Graph& g, 
+								          std::unordered_map<int, std::vector<int>> monAdjSetP)
 {
 	// begin
 	auto monAdjSet = std::move(monAdjSetP);

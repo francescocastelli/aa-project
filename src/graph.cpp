@@ -45,18 +45,7 @@ void Graph::removeEdge(int n1, int n2)
 	--numEdges;
 }
 
-int Graph::getNodeNumber() const
-{
-	return numNodes;
-}
-
-int Graph::getEdgeNumber() const 
-{
-	return numEdges;
-}
-
-// num_edges is the maximum number of edges per vertex
-void Graph::randomPopulate(int numNodes, int maxNumEdges, int seed)
+void Graph::randomPopulate(int numNodes, int maxNumEdges)
 {
 	// add nodes from 0 to numNodes
 	for (int i=0; i<numNodes; ++i)
@@ -66,7 +55,7 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges, int seed)
 	for (int i=0; i<numNodes; ++i)
 		for (int j=0; j<maxNumEdges; ++j)
 		{
-			int node = randomNode(0, numNodes-1, seed); 
+			int node = randomNode(0, numNodes-1); 
 			int nodeCount = std::count(graph[i].adjSet.begin(), graph[i].adjSet.end(), node);
 
 			if (node != i && nodeCount == 0)
@@ -80,36 +69,9 @@ void Graph::randomPopulate(int numNodes, int maxNumEdges, int seed)
 			removeNode(i);
 }
 
-// get the vertex based on the order (this is a) 
-int Graph::getVertex(int orderIdx) const
+Graph::setTy Graph::computeMonAdjSet() const
 {
-	return order[orderIdx];	
-}
-
-// get the order based on the vertex (this is a^-1) 
-int Graph::getOrder(int vertex) const 
-{
-	return inverseOrder.at(vertex);
-}
-
-Graph::nodeListTy Graph::getOrder() const
-{
-	return order;
-}
-
-Graph::nodeListTy Graph::getNodeList() const
-{
-	return nodeList;
-}
-
-Graph::nodeListTy Graph::getAdjSet(int n) const
-{
-	return graph.at(n).adjSet;
-}
-
-std::map<int, Graph::nodeListTy> Graph::computeMonAdjSet() const
-{
-	std::map<int, nodeListTy> monAdjSet;
+	std::unordered_map<int, nodeListTy> monAdjSet;
 
 	for (auto const& n: nodeList) 
 		for (int i=0; i<graph.at(n).adjSet.size(); ++i)
@@ -130,7 +92,7 @@ Graph::nodeListTy Graph::computeMonAdjSet(int n) const
 	return monAdjSet;
 }
 
-void Graph::addNewEdges(std::map<int, Graph::nodeListTy> monAdjSet)
+void Graph::addNewEdges(setTy monAdjSet)
 {
 	auto newMonAdjSet = std::move(monAdjSet);
 
@@ -148,7 +110,7 @@ void Graph::addNewEdges(std::map<int, Graph::nodeListTy> monAdjSet)
 	}
 }
 
-int Graph::countNewEdges(std::map<int, Graph::nodeListTy> monAdjSet)
+int Graph::countNewEdges(setTy monAdjSet)
 {
 	int count = 0;
 	auto newMonAdjSet = std::move(monAdjSet);
@@ -201,7 +163,45 @@ void Graph::printGraph() const
 	}
 }
 
-int Graph::randomNode(int min, int max, int seed)
+int Graph::getNodeNumber() const
+{
+	return numNodes;
+}
+
+int Graph::getEdgeNumber() const 
+{
+	return numEdges;
+}
+
+// get the vertex based on the order (this is a) 
+int Graph::getVertex(int orderIdx) const
+{
+	return order[orderIdx];	
+}
+
+// get the order based on the vertex (this is a^-1) 
+int Graph::getOrder(int vertex) const 
+{
+	return inverseOrder.at(vertex);
+}
+
+Graph::nodeListTy Graph::getOrder() const
+{
+	return order;
+}
+
+Graph::nodeListTy Graph::getNodeList() const
+{
+	return nodeList;
+}
+
+Graph::nodeListTy Graph::getAdjSet(int n) const
+{
+	return graph.at(n).adjSet;
+}
+
+
+int Graph::randomNode(int min, int max)
 {
 	std::random_device dev;
 	std::mt19937 rng(dev());

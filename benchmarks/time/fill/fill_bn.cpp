@@ -1,5 +1,6 @@
 #include <iostream>
 #include <numeric>
+#include <unordered_map>
 #include <bits/stdc++.h> 
 #include <benchmark/benchmark.h>
 #include "../../../include/graph.h"
@@ -8,17 +9,17 @@
 static void BM_fill(benchmark::State& state) 
 {
 	Graph g; 
-	std::map<int, std::vector<int>> outputSet;	
+	std::unordered_map<int, std::vector<int>> outputSet;	
 
-	g.randomPopulate(state.range(0), state.range(1), 1);
+	g.randomPopulate(state.range(0), state.range(1));
 
 	// create random order for the nodes
-	std::vector<int> order = std::move(g.getNodeList());
+	auto order = std::move(g.getNodeList());
     std::random_shuffle(order.begin(), order.end());
 	g.setOrder(std::move(order));
 
 	// compute the monotonely adj sets of the graph
-	auto monAdjSet = g.computeMonAdjSet();
+	auto monAdjSet = std::move(g.computeMonAdjSet());
 
 	// n is the number of nodes of the graph g
 	// e is the number of edges of the graph g 

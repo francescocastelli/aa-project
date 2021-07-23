@@ -45,6 +45,36 @@ private:
 	std::vector<cellInfo> cells;
 };
 
+/*  parameters :
+ * 		graph g, the graph on which we apply lexm 
+ * 
+ * 	pseudo-code: 
+ *
+ * 		lexp algorithm is applyed to a graph with no order to compute a perfect order.
+ *
+ * 		this goal can also be reached using lexm and then testing that the fill-in set 
+ * 		is empty using fill. But lexp will produce the same result is less time.
+ * 		We exploit the fact that we are searching for perfect orders, and this implies 
+ * 		that the fill-in set will be empty and the label of a node can be computed from 
+ * 		its monotonely adjacent set.
+ *
+ * 		1. assign to all nodes the empty label 
+ * 		2. loop from n to 1 (this defines the order) 
+ *         2.a get an unnumbered node with largest label (v)
+ *         2.b assign to this node the current order 
+ *         2.c update2
+ *  
+ *  	update2: 
+ *  		for each unnumbered vertex w adjacent to v add the current order index to 
+ *  		label of w.
+ *
+ *  Complexity:
+ *  	n is the number of nodes 
+ *  	e is the total number of edges of g
+ *
+ *  	time complexity: O(n + e)
+ *  	space complexity: O(n + e)
+ */
 void lexp(Graph& g)
 {
 	auto numNodes = g.getNodeNumber();

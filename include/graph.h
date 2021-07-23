@@ -6,8 +6,7 @@
 class Graph 
 {
 	using nodeListTy = std::vector<int>;
-
-private:
+	using setTy = std::unordered_map<int, nodeListTy>;
 
 	struct nodeInfo 
 	{
@@ -38,12 +37,40 @@ public:
 
 	void removeEdge(int n1, int n2);
 
+	// num_edges is the maximum number of edges per vertex
+	// populate a graph with numNodes nodes and where each node has at maximum 
+	// maxNumEdges edges.
+	// (the number of edges for each node is choosen at random from 0 - maxNumEdges)
+	void randomPopulate(int numNodes, int maxNumEdges);
+
+	// compute the monotonely adjacent set for each node
+	// return a map containing all the info
+	setTy computeMonAdjSet() const;
+
+	// compute the monotonely adjacent set for the specified node n
+	nodeListTy computeMonAdjSet(int n) const;
+
+	// take in input a map of monotonely adj set and 
+	// computes the difference wrt to ones of the current graph
+	// then add the new edges
+	void addNewEdges(setTy monAdjSet);
+
+	// take in input a map of monotonely adj set and 
+	// computes the difference wrt to ones of the current graph
+	// return the number of nodes that will be added
+	int countNewEdges(setTy monAdjSet);
+
+	void setOrder(nodeListTy order);
+
+	void reset();
+
+	void printGraph() const;
+
+	// ------------------------------------------------------------------------------------ 
+
 	int getNodeNumber() const;
 
 	int getEdgeNumber() const;
-
-	// num_edges is the maximum number of edges per vertex
-	void randomPopulate(int numNodes, int maxNumEdges, int seed = -1);
 
 	nodeListTy getNodeList() const;
 
@@ -58,23 +85,6 @@ public:
 
 	// get the adjacent list of node n
 	nodeListTy getAdjSet(int n) const;
-
-	std::map<int, nodeListTy> computeMonAdjSet() const;
-
-	nodeListTy computeMonAdjSet(int n) const;
-
-	// take in input a map of monotonely adj set and 
-	// computes the difference wrt to ones of the current graph
-	// then add the new edges
-	void addNewEdges(std::map<int, nodeListTy> monAdjSet);
-
-	int countNewEdges(std::map<int, nodeListTy> monAdjSet);
-
-	void setOrder(nodeListTy order);
-
-	void reset();
-
-	void printGraph() const;
 
 private: 
 	using graphTy = std::unordered_map<int, nodeInfo>;
@@ -92,6 +102,6 @@ private:
 
 	// ------------------ private methods ------------------
 	
-    int randomNode(int min, int max, int seed);
+    int randomNode(int min, int max);
 };
 

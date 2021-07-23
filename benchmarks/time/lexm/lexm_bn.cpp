@@ -8,7 +8,7 @@
 static void BM_lexm(benchmark::State& state) 
 {
 	Graph g; 
-	g.randomPopulate(state.range(0), state.range(1), 1);
+	g.randomPopulate(state.range(0), state.range(1));
 
 	// n is the number of nodes of the graph g
 	// e is the number of edges of the graph g 
@@ -25,7 +25,7 @@ static void BM_lexm(benchmark::State& state)
 }
 
 BENCHMARK(BM_lexm)->RangeMultiplier(2)
-				  ->Ranges({{1<<8, 1<<12}, {1<<1, 1<<6}})
+				  ->Ranges({{1<<8, 1<<13}, {1<<1, 1<<6}})
 				  // linear here bc we set N as n+e
 				  //->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 				  ->Complexity();

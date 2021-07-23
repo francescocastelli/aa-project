@@ -6,6 +6,45 @@
 namespace graph_algorithms 
 {
 
+/*  parameters :
+ * 		graph g, the graph on which we apply lexm 
+ * 
+ * 	pseudo-code: 
+ *
+ * 		lexm algorithm is applyed to a graph with no order to compute a minimal order. Any 
+ * 		ordering generated with lexm is a lexicographic order.
+ *
+ * 		lexm tries to find minimal ordering, not just perfect ordering, and this implies 
+ * 		that there may be fill-in edges, making the label updating more complicated.
+ *
+ * 		1. assign to all nodes the empty label 
+ * 		2. loop from n to 1 (this defines the order) 
+ *         2.a get an unnumbered node with largest label (v)
+ *         2.b assign to this node the current order 
+ *         2.c update 
+ *  
+ *  	update: 
+ *  		update should find all the chains of nodes from v to w, where all the nodes
+ *  		in the chain are unnumbered and the corresponding labels are less than the 
+ *  		label of w. Once all the w that respect this condition are found, we should 
+ *  		add the current order index to the label of w.
+ *
+ *  		This is implemented by keeping all the verteces ordered by labels, and pick 
+ *  		every time a vertex with the highest label value (v). 
+ *  		First the search is applyed to the adj nodes of v, and then extended through
+ *  		vertices of second highest label and so on. 
+ *  		The chain of verteces is found because we go through reach from 1 to k, 
+ *  		and in this way we get all the verteces with lowest labels first.
+ *  		For every nodes that is connected with a rigth chain with v, we increase the 
+ *  		label.
+ *
+ *  Complexity:
+ *  	n is the number of nodes 
+ *  	e is the total number of edges of g
+ *
+ *  	time complexity: O(n * e)
+ *  	space complexity: O(n + e)
+ */
 void lexm(Graph &g)
 {
 	int numNodes = g.getNodeNumber();
@@ -58,6 +97,7 @@ void lexm(Graph &g)
 		for (auto const& n : unnumbered)
 			unreached[n] = true;
 
+		// first level search
 		for (auto const& w : g.getAdjSet(v))
 			// check that w is unnumbered
 			if (inverseOrder[w] == 0)
