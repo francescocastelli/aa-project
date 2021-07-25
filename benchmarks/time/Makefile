@@ -1,4 +1,4 @@
-dirs := fill lexp lexm
+dirs := fill lexp lexm graphRandomCreation
 
 all: test clean
 

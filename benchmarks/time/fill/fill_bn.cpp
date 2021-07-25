@@ -11,7 +11,7 @@ static void BM_fill(benchmark::State& state)
 	Graph g; 
 	std::unordered_map<int, std::vector<int>> outputSet;	
 
-	g.randomPopulate(state.range(0), state.range(1));
+	g.randomPopulate(state.range(0), (float) (state.range(1)) / 10.0f);
 
 	// create random order for the nodes
 	auto order = std::move(g.getNodeList());
@@ -46,7 +46,7 @@ static void BM_fill(benchmark::State& state)
 }
 
 BENCHMARK(BM_fill)->RangeMultiplier(2)
-				  ->Ranges({{1<<8, 1<<13}, {1<<1, 1<<4}})
+				  ->Ranges({{1<<8, 1<<13}, {1, 6}})
 				  // linear here bc we set N as n+e'
 				  ->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 

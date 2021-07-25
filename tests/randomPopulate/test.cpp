@@ -6,7 +6,7 @@ namespace my {
 namespace project {
 namespace {
 
-class GraphTest : public ::testing::TestWithParam<std::pair<int, int>> {
+class GraphTest : public ::testing::TestWithParam<std::pair<int, float>> {
 
 protected:
   GraphTest() {
@@ -18,11 +18,12 @@ protected:
 
   void SetUp() override {
 	  numNodes = std::get<0>(GetParam());
-	  numEdges = std::get<1>(GetParam());;
+	  density = std::get<1>(GetParam());
 
-	  g.randomPopulate(numNodes, numEdges);
-	  std::vector<int> order = std::move(g.getNodeList());
+	  g.randomPopulate(numNodes, density);
+
 	  // create random order for the nodes
+	  std::vector<int> order = std::move(g.getNodeList());
 	  std::random_shuffle(order.begin(), order.end());
 	  g.setOrder(std::move(order));
 
@@ -33,7 +34,7 @@ protected:
   }
 
   int numNodes;
-  int numEdges;
+  float density;
   std::vector<int> nodes;
   Graph g;
 };
@@ -56,6 +57,7 @@ TEST_P(GraphTest, GraphPopoluateEdges) {
   }
 }
 
+// check that a vertex is not in its adjSet
 TEST_P(GraphTest, GraphNoSameVertexInEdges) {
   // it through verteces
   for(auto const& i: nodes)
@@ -68,6 +70,7 @@ TEST_P(GraphTest, GraphNoSameVertexInEdges) {
   }
 }
 
+// check no duplicate edges are present
 TEST_P(GraphTest, GraphNoDuplicateEdges) {
   // it through verteces
   for(auto const& i: nodes)
@@ -111,6 +114,7 @@ TEST_P(GraphTest, CorrectNumberOfEdges) {
 	EXPECT_EQ(g.getEdgeNumber(), sum/2) << "number of edges in g is not correct";
 }
 
+// check that monAdjSet are correctly computed
 TEST_P(GraphTest, CheckMonAdjSet) {
   // it through verteces
   for(auto const& i: nodes)
@@ -129,10 +133,11 @@ TEST_P(GraphTest, CheckMonAdjSet) {
   }
 }
 
-const std::pair<int, int> values[] = {std::make_pair(20, 5), std::make_pair(25, 10), 
-									  std::make_pair(5, 10), std::make_pair(50, 30), 
-									  std::make_pair(2, 1), std::make_pair(100, 100), 
-									  std::make_pair(100, 2)};
+const std::pair<int, float> values[] = {std::make_pair(20, 0.05f), std::make_pair(20, 0.1f), 
+										std::make_pair(20, 0.2f), std::make_pair(20, 0.9f), 
+										std::make_pair(20, 1.0f), std::make_pair(2, 0.1f), 
+										std::make_pair(2, 1.0f), std::make_pair(100, 1.0f), 
+										std::make_pair(100, 0.5f), std::make_pair(100, 0.1f)};
 
 INSTANTIATE_TEST_SUITE_P(nodesEdgesRange, 
 						 GraphTest, 

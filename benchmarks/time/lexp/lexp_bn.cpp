@@ -8,7 +8,7 @@
 static void BM_lexp(benchmark::State& state) 
 {
 	Graph g; 
-	g.randomPopulate(state.range(0), state.range(1));
+	g.randomPopulate(state.range(0), (float)(state.range(1)) / 10.0f);
 
 	// n is the number of nodes of the graph g
 	// e is the number of edges of the graph g 
@@ -24,8 +24,9 @@ static void BM_lexp(benchmark::State& state)
     state.SetComplexityN(state.counters["n"] + state.counters["e"]);
 }
 
-BENCHMARK(BM_lexp)->RangeMultiplier(2)
-				  ->Ranges({{1<<8, 1<<14}, {1<<1, 1<<6}})
+BENCHMARK(BM_lexp)->Unit(benchmark::kMicrosecond)
+				  ->RangeMultiplier(2)
+				  ->Ranges({{1<<5, 1<<11}, {1, 9}})
 				  // linear here bc we set N as n+e
 				  ->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 

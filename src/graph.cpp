@@ -16,8 +16,8 @@ void Graph::addNode(int n)
 
 void Graph::addEdge(int n1, int n2)
 {
-	if (graph.count(n1) == 0) {++numNodes; addNode(n1);}
-	if (graph.count(n2) == 0) {++numNodes; addNode(n2);}
+	if (graph.count(n1) == 0) {addNode(n1);}
+	if (graph.count(n2) == 0) {addNode(n2);}
 
 	graph[n1].adjSet.push_back(n2);
 	graph[n2].adjSet.push_back(n1);
@@ -45,28 +45,17 @@ void Graph::removeEdge(int n1, int n2)
 	--numEdges;
 }
 
-void Graph::randomPopulate(int numNodes, int maxNumEdges)
+void Graph::randomPopulate(int numNodes, float q)
 {
-	// add nodes from 0 to numNodes
-	for (int i=0; i<numNodes; ++i)
-		addNode(i);
-
 	// generate edges at random for each node i
 	for (int i=0; i<numNodes; ++i)
-		for (int j=0; j<maxNumEdges; ++j)
+		for (int j=i+1; j<numNodes; ++j)
 		{
-			int node = randomNode(0, numNodes-1); 
-			int nodeCount = std::count(graph[i].adjSet.begin(), graph[i].adjSet.end(), node);
+			float p = uniformProb();
 
-			if (node != i && nodeCount == 0)
-				addEdge(i, node);
+			if (p < q)
+				addEdge(i, j);
 		}
-	
-	// delete disconnected nodes
-	int count = 0;
-	for (int i=0; i<numNodes; ++i)
-		if (graph[i].adjSet.size() == 0)
-			removeNode(i);
 }
 
 Graph::setTy Graph::computeMonAdjSet() const
@@ -206,5 +195,13 @@ int Graph::randomNode(int min, int max)
 	std::random_device dev;
 	std::mt19937 rng(dev());
 	std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
+	return dist(rng);
+}
+
+float Graph::uniformProb()
+{
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_real_distribution<float> dist(0.0, 1.0);
 	return dist(rng);
 }
