@@ -32,21 +32,22 @@ static void BM_fill(benchmark::State& state)
 	// we count every time the new edges added with fill  
     for (auto _ : state)
     {
-		benchmark::DoNotOptimize(outputSet = std::move(graph_algorithms::fill(g, std::move(monAdjSet))));
+		benchmark::DoNotOptimize(outputSet = std::move(graph_algorithms::fill(g, monAdjSet)));
 		state.PauseTiming();
 		state.counters["e'"] += state.counters["e"] + g.countNewEdges(std::move(outputSet));
 		state.ResumeTiming();
     }
 
 	// we average the value of e' among the iterations 
-	state.counters["e'"] = state.counters["e'"] / state.iterations(); 
+	state.counters["e'"] = (int)(state.counters["e'"] / state.iterations()); 
 
 	// the complexity should be O(n+e')
     state.SetComplexityN(g.getNodeNumber() + state.counters["e'"]);
 }
 
-BENCHMARK(BM_fill)->RangeMultiplier(2)
-				  ->Ranges({{1<<8, 1<<13}, {1, 6}})
+BENCHMARK(BM_fill)->Unit(benchmark::kMicrosecond)
+				  ->RangeMultiplier(2)
+				  ->Ranges({{1<<5, 1<<12}, {1, 8}})
 				  // linear here bc we set N as n+e'
 				  ->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 
