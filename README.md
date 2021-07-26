@@ -54,7 +54,7 @@ This algorithm constructs an ordering $\alpha$ for an unordered graph G. Any ord
 Pseudo-algorithm: 
 
  1.  Assign the empty label to all nodes
- 2. For i = n step -1 until 1 
+ 2. For i = n step -1 until 1
 	 2a. Select an unnumbered vertex with largest label 
 	 2b. Assign to v the order i
 	 2c. Update (see below)
@@ -78,6 +78,7 @@ The unnumbered vertices are kept in labels order, and at each step we select the
 First the search goes through the adjacent set of the current selected vertex, and update their labels since they met the condition of update. Then we extend the search to second highest label, and so on.
 
 #### Asymptotic analysis
+In the implementation of LEXM we are sure that each vertex is examined only once per search, leading to a searching time of O(e). The search is execute for n times, thus:
 
 **Time complexity**: O( n * e ), where n is the number of nodes and e is the number of edges of G.
 **Space complexity**: O( n + e )
