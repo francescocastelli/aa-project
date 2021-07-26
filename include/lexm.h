@@ -57,7 +57,7 @@ void lexm(Graph &g)
 	// map of labels, indexed by nodes
 	std::unordered_map<int, float> labels;
 
-	std::map<int, bool> unreached;
+	std::unordered_map<int, bool> unreached;
 
 	std::vector<int> order (numNodes);
 	std::unordered_map<int, int> inverseOrder;

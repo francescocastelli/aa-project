@@ -1,6 +1,6 @@
 cc := clang++
-ccflags := -std=c++11 -isystem benchmark/include -O3
-lflags := -lbenchmark -lpthread 
+ccflags := -std=c++11 -isystem benchmark/include -O3 -flto
+lflags := -lbenchmark -lpthread -flto
 src := ../../../src/graph.cpp
 obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 rm := rm -f

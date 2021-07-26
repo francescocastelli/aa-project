@@ -32,9 +32,10 @@ static void BM_fill(benchmark::State& state)
 	// we count every time the new edges added with fill  
     for (auto _ : state)
     {
-		benchmark::DoNotOptimize(outputSet = std::move(graph_algorithms::fill(g, monAdjSet)));
+		benchmark::DoNotOptimize(outputSet = std::move(graph_algorithms::fill(g, std::move(monAdjSet))));
 		state.PauseTiming();
 		state.counters["e'"] += state.counters["e"] + g.countNewEdges(std::move(outputSet));
+		monAdjSet = std::move(g.computeMonAdjSet());
 		state.ResumeTiming();
     }
 
@@ -47,7 +48,7 @@ static void BM_fill(benchmark::State& state)
 
 BENCHMARK(BM_fill)->Unit(benchmark::kMicrosecond)
 				  ->RangeMultiplier(2)
-				  ->Ranges({{1<<5, 1<<12}, {1, 8}})
+				  ->Ranges({{1<<5, 1<<12}, {1, 9}})
 				  // linear here bc we set N as n+e'
 				  ->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 

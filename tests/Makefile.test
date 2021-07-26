@@ -1,6 +1,6 @@
-cc := g++
-ccflags := -O3
-lflags := -lgtest -lgtest_main -lpthread
+cc := clang++
+ccflags := -O3 -flto
+lflags := -lgtest -lgtest_main -lpthread -flto
 src := ../../src/graph.cpp
 obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 rm := rm -f

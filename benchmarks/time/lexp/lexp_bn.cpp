@@ -26,7 +26,7 @@ static void BM_lexp(benchmark::State& state)
 
 BENCHMARK(BM_lexp)->Unit(benchmark::kMicrosecond)
 				  ->RangeMultiplier(2)
-				  ->Ranges({{1<<5, 1<<11}, {1, 9}})
+				  ->Ranges({{1<<5, 1<<12}, {1, 9}})
 				  // linear here bc we set N as n+e
 				  ->Complexity([](benchmark::IterationCount n)->double{return static_cast<double>(n);});
 
