@@ -52,23 +52,25 @@ void lexm(Graph &g)
 
 	// reach is indexed by labels
 	std::unordered_map<int, std::vector<int>> reach;
-	// vector of nodes, always ordered in increasing order 
-	std::vector<int> unnumbered;
 	// map of labels, indexed by nodes
 	std::unordered_map<int, float> labels;
 
+	// vector of nodes, always ordered in increasing order 
+	std::vector<int> unnumbered;
 	std::unordered_map<int, bool> unreached;
 
+	// order 
 	std::vector<int> order (numNodes);
 	std::unordered_map<int, int> inverseOrder;
 
 	// begin 
+	unnumbered.reserve(numNodes);
 	for (auto const& n : nodes)
 	{
 		labels[n] = 1.0f;
 		inverseOrder[n] = 0;
-		unnumbered.push_back(n);
 		unreached[n] = true;
+		unnumbered.push_back(n);
 	}
 
 	// k is the number of distinct labels
@@ -102,11 +104,12 @@ void lexm(Graph &g)
 			// check that w is unnumbered
 			if (inverseOrder[w] == 0)
 			{
-				reach[labels[w]].push_back(w);
+				auto& labelsW = labels[w];
+				reach[labelsW].push_back(w);
 				// mark w reached
 				unreached[w] = false;
 
-				labels[w]  = labels[w] + 0.5f;
+				labelsW = labelsW + 0.5f;
 				// mark v, w as edge on g*
 			}
 
@@ -119,18 +122,22 @@ void lexm(Graph &g)
 				reach[j].pop_back();
 
 				for(auto const& z : g.getAdjSet(w))
-					if (unreached[z])
+				{
+					auto& unreachedZ = unreached[z];
+					if (unreachedZ)
 					{
+						auto& labelsZ = labels[z];
 						// mark z reached
-						unreached[z] = false;
-						if (labels[z] > j) 
+						unreachedZ = false;
+						if (labelsZ > j) 
 						{
-							reach[labels[z]].push_back(z);
-							labels[z]  = labels[z] + 0.5f;
+							reach[labelsZ].push_back(z);
+							labelsZ = labelsZ + 0.5f;
 							// mark v, z as an edge of g*
 						}
 						else reach[j].push_back(z);
 					}
+				}
 			}
 		// end search
 		// sort

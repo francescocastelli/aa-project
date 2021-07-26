@@ -139,12 +139,13 @@ void lexp(Graph& g)
 		for(const auto& w: adjSetV)
 			if (inverseOrder[w] == 0)
 			{
+				auto& cellw = cells.cell(w);
 				// delete cell of w from set
-				cells.next(cells.back(cells.cell(w))) = cells.next(cells.cell(w));
-				if (cells.next(cells.cell(w)) != CellList::nullvalue) 
-					cells.back(cells.next(cells.cell(w))) = cells.back(cells.cell(w));
+				cells.next(cells.back(cellw)) = cells.next(cellw);
+				if (cells.next(cellw) != CellList::nullvalue) 
+					cells.back(cells.next(cellw)) = cells.back(cellw);
 				
-				int h = cells.back(cells.flag(cells.cell(w)));
+				int h = cells.back(cells.flag(cellw));
 				// if h is an old set then create a new set
 				if (cells.flag(h) == CellList::nullvalue)
 				{
@@ -161,13 +162,13 @@ void lexp(Graph& g)
 				}
 
 				// add cell of w to new set
-				cells.next(cells.cell(w)) = cells.next(h);
+				cells.next(cellw) = cells.next(h);
 				if (cells.next(h) != CellList::nullvalue) 
-					cells.back(cells.next(h)) = cells.cell(w);
+					cells.back(cells.next(h)) = cellw;
 
-				cells.flag(cells.cell(w)) = h; 
-				cells.back(cells.cell(w)) = h;
-				cells.next(h) = cells.cell(w);
+				cells.flag(cellw) = h; 
+				cells.back(cellw) = h;
+				cells.next(h) = cellw;
 			}
 
 		for (const auto& h: fixlist)

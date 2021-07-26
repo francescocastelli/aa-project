@@ -50,15 +50,16 @@ std::unordered_map<int, std::vector<int>> fill(const Graph& g,
 		v = g.getVertex(i); 
 
 		// dup 
-		for (int j=0; j<monAdjSet[v].size(); ++j)
+		auto& monAdjSetV = monAdjSet[v];
+		for (int j=0; j<monAdjSetV.size(); ++j)
 		{
-			int w = monAdjSet[v][j];
+			int w = monAdjSetV[j];
 			int wOrder = g.getOrder(w);
 			
 			if (test[wOrder]) 	
 			{
-				std::swap(monAdjSet[v][j], monAdjSet[v].back());
-				monAdjSet[v].pop_back();
+				std::swap(monAdjSetV[j], monAdjSetV.back());
+				monAdjSetV.pop_back();
 				--j;
 			}
 			else
@@ -73,10 +74,10 @@ std::unordered_map<int, std::vector<int>> fill(const Graph& g,
 		int m = g.getVertex(k);
 
 		// add 
-		size = monAdjSet[v].size();
+		size = monAdjSetV.size();
 		for (int j=0; j<size; ++j)
 		{
-			int w = monAdjSet[v][j];
+			int w = monAdjSetV[j];
 			// reset the test vector
 			test[g.getOrder(w)] = false;
 
