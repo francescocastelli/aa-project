@@ -14,6 +14,15 @@ The paper considers graph elimination process and provide two new algorithms for
 The paper also provide a new linear-time algorithm (FILL) to calculate the fill-in produced by any elimination ordering. 
 The graphs are always supposed to be **undirected** and **connected**.
 
+## Notations 
+
+ - **G( V, E )** : graph G with set V of vertices adn set E of edges 
+ - **n, e** : n is the number of nodes, e is the number of edges 
+ - **α** : ordering of V for a graph G, bijection {1, ..., n} <-> V
+ - **G<sub>α</sub>** : graph G with ordering α
+ - **madj(v)** : set of monotonely adjacent vertices of v in G, composed by all the adjcent vertices of v that have an order greater that the order of v
+ - v ->- w : this means that w is monotonely adjacent to v, so it's adjacent to v and also have higher order
+ 
 ## Elimination process on ordered graphs
 For an ordered graph the **elimination process** is the sequence of **v-elimination graph** G<sub>v</sub> defined recursively starting from the original graph G and repeated for n-1 times. The node that is eliminated in each step is chosen based on the order of the graph. 
 
@@ -26,9 +35,9 @@ and so this means that the elimination process may add new edges to the graph at
 The set of edges that is added in the whole elimination process is called the **fill-in set** of G<sub>α</sub> (written F(G<sub>α</sub>)).
 The **fill-in set** is strictly related to the graph and the order α. 
 
-The **elimination graph** G<sup>*</sup><sub>α</sub> is defined starting from graph G and adding the edges present in the fill-in set F(G<sub>α</sub>)
+The **elimination graph** G<sup>*</sup><sub>α</sub> is defined starting from graph G and adding the edges present in the fill-in set F(G<sub>α</sub>):
 
-G<sup>*</sup><sub>α</sub> = ( V, E U F(G<sub>α</sub>) ) 
+<p align='center'> G<sup>*</sup><sub>α</sub> = ( V, E U F(G<sub>α</sub>) ) </p>
 
 ## Elimination orderings
 An ordering α is:
@@ -51,12 +60,12 @@ We can define precedence between labels L<sub>1</sub> = {p<sub>1</sub>, ..., p<s
 
 This algorithm constructs an ordering α for an unordered graph G. Any order generated with LEXM is called a **lexicographic ordering** and can be proved that **any lexicographic ordering is also a minimal ordering**.
 
-Pseudo-algorithm: 
+**Pseudo-algorithm:** 
 
  1.  Assign the empty label to all nodes
- 2. For i = n step -1 until 1
-	 2a. Select an unnumbered vertex with largest label 
-	 2b. Assign to v the order i
+ 2. For i = n step -1 until 1\
+	 2a. Select an unnumbered vertex with largest label\
+	 2b. Assign to v the order i\
 	 2c. Update (see below)
 
 The algorithm starts by setting to all the vertices the empty label. Then it iterates from n to 1 (this defines the order) and select the current vertex v as the one with the largest label among the vertices with no order yet assigned. The current loop step defines the order of the vertex v, and then we perform the update operation. 
@@ -80,19 +89,19 @@ First the search goes through the adjacent set of the current selected vertex, a
 #### Asymptotic analysis
 In the implementation of LEXM we are sure that each vertex is examined only once per search, leading to a searching time of O(e). The search is execute for n times, thus:
 
-**Time complexity**: O( n * e ), where n is the number of nodes and e is the number of edges of G.
+**Time complexity**: O( n * e ), where n is the number of nodes and e is the number of edges of G.\
 **Space complexity**: O( n + e )
 
 ### LEXP and perfect orderings
-This algorithm will generate a perfect ordering $\alpha$ for a graph G, if G has any perfect orderings. Otherwise is not guaranteed that $\alpha$ will be even minimal. 
+This algorithm will generate a perfect ordering α for a graph G, if G has any perfect orderings. Otherwise is not guaranteed that α will be even minimal. 
 
-Pseudo-algorithm: 
+**Pseudo-algorithm:** 
 
  1. Assign the empty label to all nodes
  2. For i = n step -1 until 1\
-	 2a. Select an unnumbered vertex with largest label\ 
+	 2a. Select an unnumbered vertex with largest label\
 	 2b. Assign to v the order i\
-	 2c. Update2 (see below)\
+	 2c. Update2 (see below)
 
 A very efficient implementation can be found by modifying the update statement of LEXM by observing that if G is perfect and $\alpha$ is a lexicographical ordering, then the **fill-in set of G is empty,** and by Lemma 6, pag. 18, we know that the labels of a vertex in the final graph can be simply found from the monotonely adjacent set of the vertex itself. 
 
@@ -102,6 +111,7 @@ Since we assume that the graph has a perfect elimination order, we can also assu
 
 #### Implementation
 
+Instead of calculate the labels for each vertices we do the opposite, so for each label value we keep a set of all vertices which habe that label. These sets are kept in a queue ordered leicographically by label (highest to lowest). When a new node v is numbered, we take all the nodes w that are ajacent to w and move them from their current set to a new one that is created and placed just in front the old one. This method mantains the lexicographical order.  
 #### Asymptotic analysis
 
 **Time complexity**: O( n + e ), where n is the number of nodes and e is the number of edges of G.\
@@ -111,23 +121,27 @@ Since we assume that the graph has a perfect elimination order, we can also assu
 
 Algorithm FILL can be used to compute the fill-in edges of a graph, given a particular ordering.
 
-Pseudo-algorithm: 
+**Pseudo-algorithm:** 
 
- 1. For i = 1 step 1 until n-1:\ 
-	 2a. Select the current vertex v based on the order\ 
+ 1. For i = 1 step 1 until n-1:\
+	 2a. Select the current vertex v based on the order\
 	 2b. Selected the vertex m(v) with the minimum order among the monotonely adjacent set of v\
 	 2c. For all w that are monotonely adjacent to v and different from m(v):\
-		 3.a Add w to the monotonely adjacent set of m(v)\
+		 3.a Add w to the monotonely adjacent set of m(v)
 
 This algorithm correctly computes the edges of the perfect elimination graph thanks to Lemma 4, pag. 11
+
 #### Lemma 4
 
+Let G<sub>α</sub> be an ordered graph. Then E U F(G<sub>α</sub>) is the smallest set E<sup>* </sup> of edges such that E ⊆ E<sup>* </sup> and 
+	<p align='center'> v ->- w in E<sup>* </sup> implies m(v) = w or m(v) ->- w in E<sup>* </sup> </p>
+
+where m(v) is the vertex u adjacent to v with the minimum order.
 
 #### Implementation
 The only thing that we have to ensure in order to make the implementation of FILL efficient is that the monotely adjacent list of a vertex should not contains too many redundant elements. This is done by looping through the adjacent set of v when computing the minimum and deleting duplicates.
 
 #### Asymptotic analysis
-
 Each time we execute statement 2.c, we are sure that the monotonely adjacent list of v is free of redundancies, thus the number of vertices added by statement 3.a is bounded by the size of the monotonely adjacent set of v. The total number of additions over all iterations of the loop is thus bounded by the number of edges of the final graph G<sup>*</sup>, leading to this complexities:
 
 **Time complexity**: O( n + e' ), where n is the number of nodes and e' is the number of edges of G<sup>*</sup>.\
