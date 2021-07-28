@@ -24,30 +24,29 @@ protected:
 
 TEST_F(GraphTest, Figure4) {
 	Graph g;
-	std::vector<int> baselineOrder = {1, 3, 4, 5, 2, 9, 8, 7, 6, 10};
+	std::vector<int> baselineOrder = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-	for (int i=10; i>0; --i)
+	for (int i=1; i<=10; ++i)
 	{
 		g.addNode(i);
 	}
 
 	g.addEdge(1, 3);
 	g.addEdge(1, 5);
+	g.addEdge(2, 6);
+	g.addEdge(2, 7);
 	g.addEdge(3, 5);
 	g.addEdge(3, 4);
 	g.addEdge(3, 9);
 	g.addEdge(4, 5);
 	g.addEdge(4, 9);
-	g.addEdge(9, 5);
-	g.addEdge(9, 10);
-	g.addEdge(8, 5);
-	g.addEdge(8, 10);
-	g.addEdge(8, 9);
-	g.addEdge(2, 6);
-	g.addEdge(2, 7);
-	g.addEdge(7, 6);
-	g.addEdge(7, 10);
+	g.addEdge(5, 8);
+	g.addEdge(5, 9);
+	g.addEdge(6, 7);
 	g.addEdge(6, 10);
+	g.addEdge(7, 10);
+	g.addEdge(8, 10);
+	g.addEdge(9, 10);
 
 	graph_algorithms::lexp(g);
 

@@ -1,5 +1,5 @@
 cc := clang++
-ccflags := -O3 -flto
+ccflags := -O3 -flto 
 lflags := -lgtest -lgtest_main -lpthread -flto
 src := ../../src/graph.cpp
 obj := $(patsubst %.cpp, %.o, $(wildcard *.cpp))

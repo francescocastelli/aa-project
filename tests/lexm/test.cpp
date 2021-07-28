@@ -1,5 +1,6 @@
 #include "../../include/graph.h"
 #include "../../include/lexm.h"
+#include "../../include/fill.h"
 #include <gtest/gtest.h>
 #include <algorithm>
 
@@ -56,6 +57,13 @@ TEST_F(GraphTest, Figure2) {
 	auto order = g.getOrder();
 	for(int i=0; i<order.size(); ++i)
 		ASSERT_EQ(order[i], baselineOrder[i]);
+
+
+	auto monAdjSet = g.computeMonAdjSet();
+	auto newMonAdjSet = graph_algorithms::fill(g, std::move(monAdjSet));
+	int numFillEdges = g.countNewEdges(newMonAdjSet);
+
+	ASSERT_EQ(numFillEdges, 9) << "num fill edges is: " << numFillEdges;
 }
 
 }  // namespace

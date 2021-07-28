@@ -47,7 +47,9 @@ void Graph::removeEdge(int n1, int n2)
 
 void Graph::randomPopulate(int numNodes, float q)
 {
-	// generate edges at random for each node i
+	// goes through every possible edge and 
+	// sample from a uniform distribution 0-1 the 
+	// probability p. if p < q keep the edge
 	for (int i=0; i<numNodes; ++i)
 		for (int j=i+1; j<numNodes; ++j)
 		{
@@ -139,19 +141,6 @@ void Graph::reset()
 	inverseOrder.clear();
 }
 
-void Graph::printGraph() const
-{
-	for (auto const& n: nodeList)
-	{
-		std::cout << "v: " << n << '\n';
-		std::cout << "	edges: ";
-		for (int j=0; j<graph.at(n).adjSet.size(); ++j)
-			std::cout <<  " [" << graph.at(n).adjSet[j] << "] ";
-
-		std::cout << "\n";
-	}
-}
-
 int Graph::getNodeNumber() const
 {
 	return numNodes;
@@ -184,18 +173,9 @@ Graph::nodeListTy Graph::getNodeList() const
 	return nodeList;
 }
 
-Graph::nodeListTy Graph::getAdjSet(int n) const
+const Graph::nodeListTy& Graph::getAdjSet(int n) const
 {
 	return graph.at(n).adjSet;
-}
-
-
-int Graph::randomNode(int min, int max)
-{
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist(min, max);
-	return dist(rng);
 }
 
 float Graph::uniformProb()

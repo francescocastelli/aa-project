@@ -85,7 +85,7 @@ public:
 	nodeListTy getOrder() const;
 
 	// get the adjacent list of node n
-	nodeListTy getAdjSet(int n) const;
+	const nodeListTy& getAdjSet(int n) const;
 
 private: 
 	using graphTy = std::unordered_map<int, nodeInfo>;
