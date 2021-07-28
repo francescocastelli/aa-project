@@ -31,15 +31,13 @@ namespace graph_algorithms
  *
  *  	time complexity: O(n+e')
  */
-std::unordered_map<int, std::vector<int>> fill(const Graph& g, 
-								          std::unordered_map<int, std::vector<int>> monAdjSetP)
+void fill(Graph& g, std::unordered_map<int, std::vector<int>> monAdjSetP)
 {
 	// begin
 	auto monAdjSet = std::move(monAdjSetP);
 
 	int numNodes = g.getNodeNumber();
 	std::vector<bool> test(numNodes, false);
-	auto nodes = std::move(g.getNodeList());
 
 	// loop
 	int k, v, size;
@@ -72,6 +70,7 @@ std::unordered_map<int, std::vector<int>> fill(const Graph& g,
 		// get the node that corresponds to the order k
 		// m is the node with minimum order among the monotonely adj nodes of v
 		int m = g.getVertex(k);
+		auto& monAdjSetM = monAdjSet[m];
 
 		// add 
 		size = monAdjSetV.size();
@@ -85,11 +84,13 @@ std::unordered_map<int, std::vector<int>> fill(const Graph& g,
 			// lemma 4 page 11
 			if (w != m) 
 			{
-				monAdjSet[m].push_back(w);
+				monAdjSetM.push_back(w);
 			}
 		}
+
+		// at this point monAdjSet of the current v will never be accessed again 
+		// since all the next vertices have an order which is greater than v
+		g.addFillInEdges(v, std::move(monAdjSetV));
 	}
-	
-	return monAdjSet;
 }
 } // namespace graph_algorithms

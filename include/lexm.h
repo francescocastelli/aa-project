@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <math.h>
 #include <unordered_map>
+#include <map>
 
 namespace graph_algorithms 
 {
@@ -48,14 +49,14 @@ namespace graph_algorithms
 void lexm(Graph &g)
 {
 	int numNodes = g.getNodeNumber();
-	auto nodes = g.getNodeList();
+	auto nodes = std::move(g.getNodeList());
 
 	// reach is indexed by labels
 	std::unordered_map<int, std::vector<int>> reach;
 	// map of labels, indexed by nodes
 	std::unordered_map<int, float> labels;
 
-	// vector of nodes, always ordered in increasing order 
+	// vector of nodes, always ordered in increasing orderde of labels
 	std::vector<int> unnumbered;
 	std::unordered_map<int, bool> unreached;
 

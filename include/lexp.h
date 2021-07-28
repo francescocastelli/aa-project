@@ -83,7 +83,6 @@ void lexp(Graph& g)
 	// represent alpha^-1 so we index it using the verteces
 	std::unordered_map<int, int> inverseOrder;
 	std::vector<int> fixlist;
-	//auto nodes = g.getNodeList();
 	std::vector<int> nodes = std::move(g.getNodeList()); 
 	std::sort(nodes.begin(), nodes.end(), std::greater<int>());
 
@@ -100,7 +99,6 @@ void lexp(Graph& g)
 
 	for (auto const& v: nodes)
 	{
-		//cells.addEmptyCell();
 		cells.head(c) = v;
 		cells.cell(v) = c; cells.next(c-1) = c;
 		cells.flag(c) = 1;
@@ -135,7 +133,7 @@ void lexp(Graph& g)
 		fixlist.clear();
 
 		// update2
-		auto adjSetV = g.getAdjSet(v);
+		auto adjSetV = std::move(g.getAdjSet(v));
 		for(const auto& w: adjSetV)
 			if (inverseOrder[w] == 0)
 			{
