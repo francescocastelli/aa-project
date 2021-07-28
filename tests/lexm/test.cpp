@@ -22,13 +22,7 @@ protected:
 };
 
 TEST_F(GraphTest, Figure2) {
-	Graph g;
-	std::vector<int> baselineOrder = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-	for (int i=1; i<10; ++i)
-	{
-		g.addNode(i);
-	}
+	Graph g(9);
 
 	g.addEdge(1, 2);
 	g.addEdge(1, 5);
@@ -54,16 +48,39 @@ TEST_F(GraphTest, Figure2) {
 
 	graph_algorithms::lexm(g);
 
-	auto order = g.getOrder();
-	for(int i=0; i<order.size(); ++i)
-		ASSERT_EQ(order[i], baselineOrder[i]);
-
-
 	auto monAdjSet = g.computeMonAdjSet();
-	auto newMonAdjSet = graph_algorithms::fill(g, std::move(monAdjSet));
-	int numFillEdges = g.countNewEdges(newMonAdjSet);
+	int numEdgesBefore = g.getEdgeNumber();
+
+	graph_algorithms::fill(g, std::move(monAdjSet));
+	int numFillEdges = g.getEdgeNumber() - numEdgesBefore;
 
 	ASSERT_EQ(numFillEdges, 9) << "num fill edges is: " << numFillEdges;
+}
+
+TEST_F(GraphTest, Figure3) {
+	Graph g(6);
+
+	g.addEdge(1, 3);
+	g.addEdge(1, 4);
+
+	g.addEdge(2, 3);
+	g.addEdge(2, 5);
+
+	g.addEdge(3, 6);
+
+	g.addEdge(4, 6);
+
+	g.addEdge(5, 6);
+
+	graph_algorithms::lexm(g);
+
+	auto monAdjSet = g.computeMonAdjSet();
+	int numEdgesBefore = g.getEdgeNumber();
+
+	graph_algorithms::fill(g, std::move(monAdjSet));
+	int numFillEdges = g.getEdgeNumber() - numEdgesBefore;
+
+	ASSERT_EQ(numFillEdges, 2) << "num fill edges is: " << numFillEdges;
 }
 
 }  // namespace

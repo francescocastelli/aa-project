@@ -8,7 +8,7 @@ namespace project {
 namespace {
 
 // The fixture for testing class Foo.
-class GraphTest : public ::testing::TestWithParam<std::pair<int, int>> {
+class GraphTest : public ::testing::TestWithParam<std::pair<int, float>> {
 
 protected:
   GraphTest() {
@@ -20,17 +20,17 @@ protected:
 
   void SetUp() override {
 	  numNodes = std::get<0>(GetParam());
-	  numEdges = std::get<1>(GetParam());;
+	  density = std::get<1>(GetParam());;
 
-	  g.randomPopulate(numNodes, numEdges);
+	  g.reserve(numNodes);
+	  g.randomPopulate(numNodes, density);
 	  std::vector<int> order = std::move(g.getNodeList());
 	  // create random order for the nodes
 	  std::random_shuffle(order.begin(), order.end());
 	  g.setOrder(std::move(order));
 
 	  auto monAdjSet = g.computeMonAdjSet();
-	  auto newMonAdjSet = graph_algorithms::fill(g, std::move(monAdjSet));
-	  g.addNewEdges(newMonAdjSet);
+	  graph_algorithms::fill(g, std::move(monAdjSet));
 	  nodes = g.getNodeList();
   }
 
@@ -38,7 +38,7 @@ protected:
   }
 
   int numNodes;
-  int numEdges;
+  float density;
   std::vector<int> nodes;
   Graph g;
 };
@@ -72,8 +72,11 @@ TEST_P(GraphTest, GraphPopoluateEdges) {
   }
 }
 
-const std::pair<int, int> values[] = {std::make_pair(20, 5), std::make_pair(25, 10), 
-									  std::make_pair(5, 10), std::make_pair(50, 30)};
+const std::pair<int, float> values[] = {std::make_pair(10, 0.1), std::make_pair(10, 0.3), 
+										std::make_pair(10, 0.5), std::make_pair(10, 0.9), 
+										std::make_pair(20, 0.1), std::make_pair(20, 0.3), 
+									  	std::make_pair(20, 0.7), std::make_pair(20, 0.5), 
+									  	std::make_pair(50, 0.1), std::make_pair(50, 0.4)};
 
 INSTANTIATE_TEST_SUITE_P(nodesEdgesRange, 
 						 GraphTest, 

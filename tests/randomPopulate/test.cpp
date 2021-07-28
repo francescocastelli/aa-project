@@ -20,6 +20,7 @@ protected:
 	  numNodes = std::get<0>(GetParam());
 	  density = std::get<1>(GetParam());
 
+	  g.reserve(numNodes);
 	  g.randomPopulate(numNodes, density);
 
 	  // create random order for the nodes
