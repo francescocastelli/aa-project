@@ -19,7 +19,7 @@ private:
 	};
 
 public:
-	CellList(int numNodes) : cells (numNodes)
+	CellList(int numNodes) : cells (numNodes), cellV(numNodes)
 	{
 	}
 
@@ -39,7 +39,7 @@ public:
 
 private:
 	// map of cell idx, indexed using a node 
-	std::unordered_map<int, int> cellV;
+	std::vector<int> cellV;
 
 	// list of cell
 	std::vector<cellInfo> cells;
@@ -81,10 +81,9 @@ void lexp(Graph& g)
 	// order, represent alpha so we index it using number from 0 to order.size() 
 	std::vector<int> order (numNodes);
 	// represent alpha^-1 so we index it using the verteces
-	std::unordered_map<int, int> inverseOrder;
+	std::vector<int> inverseOrder (numNodes);
 	std::vector<int> fixlist;
 	std::vector<int> nodes = std::move(g.getNodeList()); 
-	std::sort(nodes.begin(), nodes.end(), std::greater<int>());
 
     CellList cells (numNodes);	
 

@@ -53,16 +53,19 @@ void lexm(Graph &g)
 
 	// reach is indexed by labels
 	std::unordered_map<int, std::vector<int>> reach;
-	// map of labels, indexed by nodes
-	std::unordered_map<int, float> labels;
+	// set of labels, indexed by nodes
+	std::vector<float> labels (numNodes);
 
 	// vector of nodes, always ordered in increasing orderde of labels
 	std::vector<int> unnumbered;
-	std::unordered_map<int, bool> unreached;
+	std::vector<bool> unreached (numNodes);
 
 	// order 
 	std::vector<int> order (numNodes);
-	std::unordered_map<int, int> inverseOrder;
+	std::vector<int> inverseOrder (numNodes);
+
+	// cache 
+	std::unordered_map<int, std::vector<int>> cache;
 
 	// begin 
 	unnumbered.reserve(numNodes);
@@ -71,7 +74,7 @@ void lexm(Graph &g)
 		labels[n] = 1.0f;
 		inverseOrder[n] = 0;
 		unreached[n] = true;
-		unnumbered.push_back(n);
+		unnumbered.emplace_back(n);
 	}
 
 	// k is the number of distinct labels
@@ -105,42 +108,44 @@ void lexm(Graph &g)
 			// check that w is unnumbered
 			if (inverseOrder[w] == 0)
 			{
-				auto& labelsW = labels[w];
-				reach[labelsW].push_back(w);
+				reach[labels[w]].push_back(w);
 				// mark w reached
 				unreached[w] = false;
 
-				labelsW = labelsW + 0.5f;
+				labels[w] = labels[w] + 0.5f;
 				// mark v, w as edge on g*
 			}
 
 		// search
 		for (int j=1; j<=k; ++j)
-			while (!reach[j].empty())
+		{
+			auto& reachJ = reach[j];
+			while (!reachJ.empty())
 			{
 				// delete a vertex w from reach(k)
-				int w = reach[j].back();
-				reach[j].pop_back();
+				int w = reachJ.back();
+				reachJ.pop_back();
 
-				for(auto const& z : g.getAdjSet(w))
+				if (!cache.contains(w)) cache[w] = std::move(g.getAdjSet(w));
+
+				for(auto const& z : cache[w])
 				{
-					auto& unreachedZ = unreached[z];
-					if (unreachedZ)
+					if (unreached[z])
 					{
-						auto& labelsZ = labels[z];
 						// mark z reached
-						unreachedZ = false;
-						if (labelsZ > j) 
+						unreached[z] = false;
+						if (labels[z] > j) 
 						{
-							reach[labelsZ].push_back(z);
-							labelsZ = labelsZ + 0.5f;
+							reach[labels[z]].push_back(z);
+							labels[z] = labels[z] + 0.5f;
 							// mark v, z as an edge of g*
 						}
-						else reach[j].push_back(z);
+						else reachJ.push_back(z);
 					}
 				}
 			}
-		// end search
+		} // end search
+
 		// sort
 		std::sort(unnumbered.begin(), unnumbered.end(), 
 				  [&labels](const int &l, const int &r) 

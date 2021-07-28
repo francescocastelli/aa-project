@@ -8,10 +8,6 @@ namespace graph_algorithms
  * 		graph g, the graph on which we apply fill 
  * 		monAdjSetP, map that contains all the monotonely adj sets for each node of the graph g 
  * 
- * return : 
- *		map that contains the new monotonely adj sets for each node, after fill algorithm is 
- *		applyed
- *
  * 	pseudo-code: 
  *
  * 		The fill algorithm can be used on graph with an order already set, and it will compute
@@ -31,7 +27,8 @@ namespace graph_algorithms
  *
  *  	time complexity: O(n+e')
  */
-void fill(Graph& g, std::unordered_map<int, std::vector<int>> monAdjSetP)
+void fill(Graph& g, std::unordered_map<int, std::vector<int>> monAdjSetP, 
+		  bool addEdges, int& fillCount)
 {
 	// begin
 	auto monAdjSet = std::move(monAdjSetP);
@@ -90,7 +87,11 @@ void fill(Graph& g, std::unordered_map<int, std::vector<int>> monAdjSetP)
 
 		// at this point monAdjSet of the current v will never be accessed again 
 		// since all the next vertices have an order which is greater than v
-		g.addFillInEdges(v, std::move(monAdjSetV));
+		// the addEdges in only used for benchmarking, since we dont want to actually
+		// add all the edges but only the number
+		if (addEdges) 
+			g.addFillInEdges(v, std::move(monAdjSetV));
+		else fillCount += g.countFillInEdges(v, std::move(monAdjSetV));
 	}
 }
 } // namespace graph_algorithms
