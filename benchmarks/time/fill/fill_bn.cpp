@@ -6,17 +6,19 @@
 #include "../../../include/graph.h"
 #include "../../../include/fill.h"
 
-static void BM_fill(benchmark::State& state) 
+static void createRandomOrder(Graph& g)
 {
-	Graph g; 
-	std::unordered_map<int, std::vector<int>> outputSet;	
-
-	g.randomPopulate(state.range(0), (float) (state.range(1)) / 10.0f);
-
 	// create random order for the nodes
 	auto order = std::move(g.getNodeList());
     std::random_shuffle(order.begin(), order.end());
 	g.setOrder(std::move(order));
+}
+
+static void BM_fill(benchmark::State& state) 
+{
+	Graph g(state.range(0)); 
+	g.randomPopulate(state.range(0), (float) (state.range(1)) / 10.0f);
+	createRandomOrder(g);
 
 	// compute the monotonely adj sets of the graph
 	auto monAdjSet = std::move(g.computeMonAdjSet());
@@ -26,21 +28,21 @@ static void BM_fill(benchmark::State& state)
 	// e' is the number of edges of the graph g* (after fill)
 	state.counters["n"] = g.getNodeNumber(); 
 	state.counters["e"] = g.getEdgeNumber();
-	state.counters["e'"] = 0;
+	int fillCount = 0;
 
 	// the graph is the same in every iteration of the loop
 	// we count every time the new edges added with fill  
     for (auto _ : state)
     {
-		benchmark::DoNotOptimize(outputSet = std::move(graph_algorithms::fill(g, std::move(monAdjSet))));
+		fillCount = 0;
+		graph_algorithms::fill(g, std::move(monAdjSet), false, fillCount);
 		state.PauseTiming();
-		state.counters["e'"] += state.counters["e"] + g.countNewEdges(std::move(outputSet));
 		monAdjSet = std::move(g.computeMonAdjSet());
 		state.ResumeTiming();
     }
 
 	// we average the value of e' among the iterations 
-	state.counters["e'"] = (int)(state.counters["e'"] / state.iterations()); 
+	state.counters["e'"] = fillCount + state.counters["e"]; 
 
 	// the complexity should be O(n+e')
     state.SetComplexityN(g.getNodeNumber() + state.counters["e'"]);

@@ -7,7 +7,7 @@
 
 static void BM_lexp(benchmark::State& state) 
 {
-	Graph g; 
+	Graph g(state.range(0)); 
 	g.randomPopulate(state.range(0), (float)(state.range(1)) / 10.0f);
 
 	// n is the number of nodes of the graph g
