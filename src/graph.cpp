@@ -1,54 +1,57 @@
 #include "../include/graph.h"
-#include <random>
-#include <iostream>
-#include <algorithm>
 
-Graph::Graph() : numNodes (0), numEdges(0)
+Graph::Graph() : nextNodeNum(0), numEdges(0)
 {
 }
 
-void Graph::_addNode(int n)
+Graph::Graph(int nodeNum) : nextNodeNum(0), 
+								  numEdges(0),
+								  inverseOrder(nodeNum)
 {
-	graph.insert({n, {nodeListTy()}});
-	nodeList.push_back(n);
-	++numNodes;
+	graph.reserve(nodeNum);
+}
+
+void Graph::reserve(int numNodes)
+{
+	graph.reserve(numNodes);
+	inverseOrder.resize(numNodes);
 }
 
 void Graph::addEdge(int n1, int n2)
 {
-	if (graph.count(n1) == 0) {_addNode(n1);};
-	if (graph.count(n2) == 0) {_addNode(n2);};
-
-	auto& adjn1 = graph[n1].adjSet;
-	auto& adjn2 = graph[n2].adjSet;
-
-	if (std::find(adjn1.begin(), adjn1.end(), n2) == adjn1.end())
+	int _n1, _n2;
+	
+	if (nodeMapping.count(n1) == 0)
 	{
-		adjn1.push_back(n2);
-		adjn1.push_back(n2);
-		++numEdges;
-	}
+		nodeMapping[n1] = nextNodeNum; _n1 = nextNodeNum;
+		graph.emplace_back(n1);
+		++nextNodeNum;
+	} else _n1 = nodeMapping[n1];
+
+	if (nodeMapping.count(n2) == 0)
+	{
+		nodeMapping[n2] = nextNodeNum; _n2 = nextNodeNum;
+		graph.emplace_back(n2);
+		++nextNodeNum;
+	} else _n2 = nodeMapping[n2];
+
+	_addEdge(_n1, _n2);
 }
 
-void Graph::_removeNode(int n)
+void Graph::_addEdge(int _n1, int _n2)
 {
-	for (auto const& adjN : graph[n].adjSet)
-		removeEdge(n, adjN);
+	graph[_n2].adjSet.insert(_n1);
+	auto res = graph[_n1].adjSet.insert(_n2);
 
-	graph.erase(n);
-	nodeList.erase(std::remove(nodeList.begin(), nodeList.end(), n), nodeList.end());
-	--numNodes;
+	// check if the element was already present or not
+	if (std::get<1>(res)) ++numEdges;
 }
 
-void Graph::removeEdge(int n1, int n2)
+void Graph::addFillInEdges(int _n, nodeListTy others)
 {
-	graph[n1].adjSet.erase(std::remove(graph[n1].adjSet.begin(), 
-									   graph[n1].adjSet.end(), n2), graph[n1].adjSet.end());
-
-	graph[n2].adjSet.erase(std::remove(graph[n2].adjSet.begin(), 
-									   graph[n2].adjSet.end(), n1), graph[n2].adjSet.end());
-
-	--numEdges;
+	auto verteces = std::move(others);
+	for (auto const& _w : verteces)
+		_addEdge(_n, _w);
 }
 
 void Graph::randomPopulate(int numNodes, float q)
@@ -68,12 +71,18 @@ void Graph::randomPopulate(int numNodes, float q)
 
 Graph::setTy Graph::computeMonAdjSet() const
 {
-	std::unordered_map<int, nodeListTy> monAdjSet;
+	setTy monAdjSet;
 
-	for (auto const& n: nodeList) 
-		for (int i=0; i<graph.at(n).adjSet.size(); ++i)
-			if (getOrder(n) < getOrder(graph.at(n).adjSet[i])) 
-				monAdjSet[n].push_back(graph.at(n).adjSet[i]);
+	for (auto i=0; i<nextNodeNum; ++i) 
+	{
+		auto& adjSetn = graph[i].adjSet;
+		auto& monAdjSetn = monAdjSet[i];
+		auto orderN = getOrder(i);
+
+		for (auto const& adjEl : adjSetn)
+			if (orderN < getOrder(adjEl)) 
+				monAdjSetn.push_back(adjEl);
+	}
 
 	return monAdjSet;
 }
@@ -81,51 +90,14 @@ Graph::setTy Graph::computeMonAdjSet() const
 Graph::nodeListTy Graph::computeMonAdjSet(int n) const
 {
 	nodeListTy monAdjSet;
+	auto& adjSetn = graph[n].adjSet;
+	auto orderN = getOrder(n);
 
-	for (int i=0; i<graph.at(n).adjSet.size(); ++i)
-		if (getOrder(n) < getOrder(graph.at(n).adjSet[i])) 
-			monAdjSet.push_back(graph.at(n).adjSet[i]);
+	for (auto const& adjEl : adjSetn)
+		if (orderN < getOrder(adjEl)) 
+			monAdjSet.push_back(adjEl);
 
 	return monAdjSet;
-}
-
-void Graph::addNewEdges(setTy monAdjSet)
-{
-	auto newMonAdjSet = std::move(monAdjSet);
-
-	for (auto const& n: nodeList)
-	{
-		auto originalAdj = std::move(computeMonAdjSet(n));
-		for (int j=0; j<newMonAdjSet[n].size(); ++j)
-		{   
-			int w = newMonAdjSet[n][j];
-			int originalCount = std::count(originalAdj.begin(), originalAdj.end(), w);
-
-			if (originalCount == 0)
-				addEdge(n, w);
-		}
-	}
-}
-
-int Graph::countNewEdges(setTy monAdjSet)
-{
-	int count = 0;
-	auto newMonAdjSet = std::move(monAdjSet);
-
-	for (auto const& n: nodeList)
-	{
-		auto originalAdj = std::move(computeMonAdjSet(n));
-		for (int j=0; j<newMonAdjSet[n].size(); ++j)
-		{   
-			int w = newMonAdjSet[n][j];
-			int originalCount = std::count(originalAdj.begin(), originalAdj.end(), w);
-
-			if (originalCount == 0)
-				++count;
-		}
-	}
-
-	return count;
 }
 
 void Graph::setOrder(nodeListTy order)
@@ -139,17 +111,30 @@ void Graph::setOrder(nodeListTy order)
 
 void Graph::reset()
 {
-	numNodes = 0;
+	nextNodeNum = 0;
 	numEdges = 0;
-	nodeList.clear();
-	order.clear();
 	graph.clear();
+	order.clear();
 	inverseOrder.clear();
+	nodeMapping.clear();
+}
+
+void Graph::printGraph() const
+{
+	for (int i=0; i<nextNodeNum; ++i)
+	{
+		std::cout << "v: " << graph[i].originalName << '\n';
+		std::cout << "	edges: ";
+		for(auto const& e : graph[i].adjSet)
+			std::cout <<  " [" << graph[e].originalName << "] ";
+
+		std::cout << "\n";
+	}	
 }
 
 int Graph::getNodeNumber() const
 {
-	return numNodes;
+	return graph.size();
 }
 
 int Graph::getEdgeNumber() const 
@@ -166,7 +151,7 @@ int Graph::getVertex(int orderIdx) const
 // get the order based on the vertex (this is a^-1) 
 int Graph::getOrder(int vertex) const 
 {
-	return inverseOrder.at(vertex);
+	return inverseOrder[vertex];
 }
 
 Graph::nodeListTy Graph::getOrder() const
@@ -174,14 +159,31 @@ Graph::nodeListTy Graph::getOrder() const
 	return order;
 }
 
-Graph::nodeListTy Graph::getNodeList() const
+Graph::nodeListTy Graph::getOriginalOrder() const
 {
-	return nodeList;
+	nodeListTy originalOrder(order.size()); 
+
+	for (auto i=0; i<order.size(); ++i)
+		originalOrder[i] = graph[order[i]].originalName;
+
+	return originalOrder;
 }
 
-const Graph::nodeListTy& Graph::getAdjSet(int n) const
+Graph::nodeListTy Graph::getNodeList() const
 {
-	return graph.at(n).adjSet;
+	std::vector<int> nodes(nextNodeNum);
+	std::iota(std::begin(nodes), std::end(nodes), 0);
+
+	return nodes;
+}
+
+Graph::nodeListTy Graph::getAdjSet(int n) const
+{
+	nodeListTy vector; 
+	auto& adjSet = graph[n].adjSet;
+
+	vector.insert(vector.end(), adjSet.begin(), adjSet.end());
+	return vector;
 }
 
 float Graph::uniformProb()

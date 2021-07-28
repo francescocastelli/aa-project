@@ -1,9 +1,12 @@
 #pragma once
 #include <vector>
-#include <map>
 #include <unordered_map>
+#include <unordered_set>
+#include <numeric>
+#include <random>
+#include <iostream>
 
-class Graph 
+class Graph
 {
 	using nodeListTy = std::vector<int>;
 	using setTy = std::unordered_map<int, nodeListTy>;
@@ -12,11 +15,17 @@ class Graph
 	{
 		// each vertex in adjSet indicates the 2nd vertex of the edge
 		// i ---- j   means graph[i].adjSet contains j
-		nodeListTy adjSet; 
+		std::unordered_set<int> adjSet; 
+
+		// original idx
+		int originalName;
+
+		nodeInfo(int originalIdx) : originalName(originalIdx) {};
 	};
 
 public:
 	Graph ();
+	Graph (int nodeNum);
 
 	Graph (const Graph&) = delete;
 	Graph (Graph&&) = default;
@@ -26,12 +35,17 @@ public:
 
 	~Graph() = default;
 
+	// reserve numNodes space for the graph 
+	// resize the inverseOrder vector
+	void reserve(int numNodes);
+
 	// add a new edge btw n1 and n2 
 	// if one of the nodes is not present, it will be inserted
 	void addEdge(int n1, int n2);
 
-
-	void removeEdge(int n1, int n2);
+	// add multiple edges at the same nodes
+	// this should be used only with nodes in the internal representation
+	void addFillInEdges(int _n, nodeListTy others);
 
 	// create a random undirected and connected graph
 	// number of nodes = numNodes
@@ -47,20 +61,11 @@ public:
 	// compute the monotonely adjacent set for the specified node n
 	nodeListTy computeMonAdjSet(int n) const;
 
-	// take in input a map of monotonely adj set and 
-	// computes the difference wrt to ones of the current graph
-	// then add the new edges
-	void addNewEdges(setTy monAdjSet);
-
-	// take in input a map of monotonely adj set and 
-	// computes the difference wrt to ones of the current graph
-	// return the number of nodes that will be added
-	int countNewEdges(setTy monAdjSet);
-
 	void setOrder(nodeListTy order);
 
 	void reset();
 
+	// print the graph with the original vertices names
 	void printGraph() const;
 
 	// ------------------------------------------------------------------------------------ 
@@ -69,6 +74,7 @@ public:
 
 	int getEdgeNumber() const;
 
+	// get the internal node list
 	nodeListTy getNodeList() const;
 
 	// get the vertex based on the order (this is a) 
@@ -80,28 +86,32 @@ public:
 	// get entire order list 
 	nodeListTy getOrder() const;
 
+	// get entire order list but with original names
+	nodeListTy getOriginalOrder() const;
+
 	// get the adjacent list of node n
-	const nodeListTy& getAdjSet(int n) const;
+	nodeListTy getAdjSet(int n) const;
 
 private: 
-	using graphTy = std::unordered_map<int, nodeInfo>;
+	// the index of the vector is the node number
+	using graphTy = std::vector<nodeInfo>;
 
-	int numNodes;
+	int nextNodeNum; 
 	int numEdges;
-	// nodeList 
-	nodeListTy nodeList;
 	// actual graph
 	graphTy graph;
+	// mapping btw internal node reprentation and user defined nodes
+	std::unordered_map<int, int> nodeMapping;
 	// alpha
 	nodeListTy order;
 	// alpha^-1
-	std::unordered_map<int, int> inverseOrder;
+	nodeListTy inverseOrder;
 
 	// ------------------ private methods ------------------
 	
 	float uniformProb();
-	// add and remove new node 
-	void _addNode(int n);
-	void _removeNode(int n);
+
+	// add edge btw node in the internal representation
+	void _addEdge(int _n1, int _n2);
 };
 
