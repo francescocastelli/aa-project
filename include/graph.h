@@ -10,12 +10,13 @@ class Graph
 {
 	using nodeListTy = std::vector<int>;
 	using setTy = std::unordered_map<int, nodeListTy>;
+	using adjSetTy = std::unordered_set<int>;
 
 	struct nodeInfo 
 	{
 		// each vertex in adjSet indicates the 2nd vertex of the edge
 		// i ---- j   means graph[i].adjSet contains j
-		std::unordered_set<int> adjSet; 
+		adjSetTy adjSet; 
 
 		// original idx
 		int originalName;
@@ -46,6 +47,9 @@ public:
 	// add multiple edges at the same nodes
 	// this should be used only with nodes in the internal representation
 	void addFillInEdges(int _n, nodeListTy others);
+
+	// counts the number of edges to be added 
+	int countFillInEdges(int _n, nodeListTy others);
 
 	// create a random undirected and connected graph
 	// number of nodes = numNodes

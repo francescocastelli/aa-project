@@ -54,6 +54,18 @@ void Graph::addFillInEdges(int _n, nodeListTy others)
 		_addEdge(_n, _w);
 }
 
+int Graph::countFillInEdges(int _n, nodeListTy others)
+{
+	int count = 0;
+	auto verteces = std::move(others);
+	auto& adjN = graph[_n].adjSet;
+
+	for (auto const& _w : verteces)
+		if (!adjN.contains(_w)) ++count;
+
+	return count;
+}
+
 void Graph::randomPopulate(int numNodes, float q)
 {
 	// goes through every possible edge and 
@@ -182,7 +194,10 @@ Graph::nodeListTy Graph::getAdjSet(int n) const
 	nodeListTy vector; 
 	auto& adjSet = graph[n].adjSet;
 
-	vector.insert(vector.end(), adjSet.begin(), adjSet.end());
+	vector.reserve(adjSet.size());
+	for (auto const& w : adjSet)
+		vector.emplace_back(w);
+
 	return vector;
 }
 
