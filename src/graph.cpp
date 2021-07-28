@@ -7,7 +7,7 @@ Graph::Graph() : numNodes (0), numEdges(0)
 {
 }
 
-void Graph::addNode(int n)
+void Graph::_addNode(int n)
 {
 	graph.insert({n, {nodeListTy()}});
 	nodeList.push_back(n);
@@ -16,15 +16,21 @@ void Graph::addNode(int n)
 
 void Graph::addEdge(int n1, int n2)
 {
-	if (graph.count(n1) == 0) {addNode(n1);}
-	if (graph.count(n2) == 0) {addNode(n2);}
+	if (graph.count(n1) == 0) {_addNode(n1);};
+	if (graph.count(n2) == 0) {_addNode(n2);};
 
-	graph[n1].adjSet.push_back(n2);
-	graph[n2].adjSet.push_back(n1);
-	++numEdges;
+	auto& adjn1 = graph[n1].adjSet;
+	auto& adjn2 = graph[n2].adjSet;
+
+	if (std::find(adjn1.begin(), adjn1.end(), n2) == adjn1.end())
+	{
+		adjn1.push_back(n2);
+		adjn1.push_back(n2);
+		++numEdges;
+	}
 }
 
-void Graph::removeNode(int n)
+void Graph::_removeNode(int n)
 {
 	for (auto const& adjN : graph[n].adjSet)
 		removeEdge(n, adjN);

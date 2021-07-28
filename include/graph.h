@@ -30,10 +30,6 @@ public:
 	// if one of the nodes is not present, it will be inserted
 	void addEdge(int n1, int n2);
 
-	// add a new node with no edges
-	void addNode(int n);
-
-	void removeNode(int n);
 
 	void removeEdge(int n1, int n2);
 
@@ -103,7 +99,9 @@ private:
 
 	// ------------------ private methods ------------------
 	
-    int randomNode(int min, int max);
 	float uniformProb();
+	// add and remove new node 
+	void _addNode(int n);
+	void _removeNode(int n);
 };
 
