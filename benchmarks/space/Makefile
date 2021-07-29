@@ -1,4 +1,4 @@
-dirs := lexm lexp
+dirs := lexm lexp fill
 
 all: test clean
 
