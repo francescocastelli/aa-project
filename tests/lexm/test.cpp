@@ -51,7 +51,8 @@ TEST_F(GraphTest, Figure2) {
 	auto monAdjSet = g.computeMonAdjSet();
 	int numEdgesBefore = g.getEdgeNumber();
 
-	graph_algorithms::fill(g, std::move(monAdjSet));
+	int fillCount = 0;
+	graph_algorithms::fill(g, std::move(monAdjSet), true, fillCount);
 	int numFillEdges = g.getEdgeNumber() - numEdgesBefore;
 
 	ASSERT_EQ(numFillEdges, 9) << "num fill edges is: " << numFillEdges;
@@ -77,7 +78,8 @@ TEST_F(GraphTest, Figure3) {
 	auto monAdjSet = g.computeMonAdjSet();
 	int numEdgesBefore = g.getEdgeNumber();
 
-	graph_algorithms::fill(g, std::move(monAdjSet));
+	int fillCount = 0;
+	graph_algorithms::fill(g, std::move(monAdjSet), true, fillCount);
 	int numFillEdges = g.getEdgeNumber() - numEdgesBefore;
 
 	ASSERT_EQ(numFillEdges, 2) << "num fill edges is: " << numFillEdges;

@@ -30,7 +30,7 @@ protected:
 	  g.setOrder(std::move(order));
 
 	  auto monAdjSet = g.computeMonAdjSet();
-	  graph_algorithms::fill(g, std::move(monAdjSet));
+	  graph_algorithms::fill(g, std::move(monAdjSet), true, fillCount);
 	  nodes = g.getNodeList();
   }
 
@@ -40,6 +40,7 @@ protected:
   int numNodes;
   float density;
   std::vector<int> nodes;
+  int fillCount;
   Graph g;
 };
 
